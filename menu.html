@@ -9,15 +9,18 @@
 :root{--bg:#0e0b16;--card:#1a1626;--accent:#7c4dff;--accent2:#b388ff;--text:#f3efff;--muted:#8a80a0}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px}
-header{background:linear-gradient(180deg,#7c4dff,#4a2b8f);padding:22px 16px 46px;text-align:center;border-radius:0 0 24px 24px}
+header{position:relative;background:linear-gradient(180deg,#7c4dff,#4a2b8f);padding:22px 16px 46px;text-align:center;border-radius:0 0 24px 24px;overflow:hidden}
+header .bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.25;filter:blur(2px)}
+header .inner{position:relative}
 .avatar{width:82px;height:82px;border-radius:50%;overflow:hidden;margin:0 auto 10px;border:2px solid #ffffff55;background:#ffffff22}
 .avatar img{width:100%;height:100%;object-fit:cover}
-h1{font-size:21px}
+h1{font-size:20px}
+.sub{font-size:12px;opacity:.85;margin-top:4px}
 .chips{display:flex;gap:7px;justify-content:center;margin-top:10px;flex-wrap:wrap}
 .chip{background:#00000044;border-radius:20px;padding:6px 12px;font-size:12px}
-nav{position:fixed;bottom:10px;left:10px;right:10px;background:#241d33f2;border-radius:20px;display:flex;justify-content:space-around;padding:7px 4px;backdrop-filter:blur(8px);box-shadow:0 6px 20px #00000088}
-nav button{background:none;border:none;color:var(--muted);font-size:10px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 6px;border-radius:12px}
-nav button .ic{font-size:19px}
+nav{position:fixed;bottom:10px;left:10px;right:10px;background:#241d33f2;border-radius:20px;display:flex;justify-content:space-around;padding:7px 2px;backdrop-filter:blur(8px);box-shadow:0 6px 20px #00000088}
+nav button{background:none;border:none;color:var(--muted);font-size:9px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 4px;border-radius:12px}
+nav button .ic{font-size:18px}
 nav button.active{color:var(--accent2);background:#7c4dff22}
 section{padding:14px}
 .card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px}
@@ -32,13 +35,23 @@ section{padding:14px}
 .item{background:#ffffff0d;border-radius:12px;padding:12px;font-size:13px;cursor:pointer}
 .item:active{background:#ffffff1a}
 .muted{color:var(--muted);font-size:12px}
+.enc{display:flex;gap:10px;align-items:center;background:#ffffff0d;border-radius:12px;padding:10px;margin-bottom:10px}
+.enc img{width:56px;height:56px;border-radius:10px;object-fit:cover;background:#ffffff14}
+.enc .t{flex:1}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{flex:1;background:#ffffff0d;border:none;color:var(--muted);border-radius:12px;padding:9px 4px;font-size:12px}
+.tabs button.active{background:var(--accent);color:#fff}
 </style>
 </head>
 <body>
 <header>
-  <div class="avatar"><img src="avatar.jpg" alt=""></div>
-  <h1 id="hello">Привет!</h1>
-  <div class="chips" id="chips"></div>
+  <div class="bg" id="scen_bg"></div>
+  <div class="inner">
+    <div class="avatar"><img id="scen_img" src="avatar.jpg" alt=""></div>
+    <h1 id="scen_name">LitRPG</h1>
+    <div class="sub" id="hello"></div>
+    <div class="chips" id="chips"></div>
+  </div>
 </header>
 <section id="content"></section>
 <nav id="nav"></nav>
@@ -46,13 +59,14 @@ section{padding:14px}
 const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
 const INIT = tg.initData;
 const API_BASE = 'https://unexpired-pogo-splotchy.ngrok-free.dev';
-let STATE = null, tab = 'home';
+let STATE = null, tab = 'home', enc_tab = 'npcs';
 
 const NAV = [
   {id:'home',ic:'🏠',t:'Домой'},
-  {id:'hero',ic:'👤',t:'Персонаж'},
-  {id:'inv',ic:'🎒',t:'Инвентарь'},
+  {id:'hero',ic:'👤',t:'Герой'},
+  {id:'inv',ic:'🎒',t:'Вещи'},
   {id:'map',ic:'🗺️',t:'Карта'},
+  {id:'ency',ic:'📚',t:'Энцикл.'},
   {id:'worlds',ic:'🌍',t:'Миры'}
 ];
 const MENU = [
@@ -62,6 +76,7 @@ const MENU = [
   {id:'map',ic:'🗺️',t:'Карта',d:'Локации и перемещение'},
   {id:'combat',ic:'⚔️',t:'Бой',d:'Тактика автобоя'},
   {id:'events',ic:'📖',t:'События',d:'Сюжетная цепочка'},
+  {id:'ency',ic:'📚',t:'Энциклопедия',d:'NPC, предметы, локации'},
   {id:'worlds',ic:'🌍',t:'Миры',d:'Переключить сценарий'}
 ];
 const TACTICS = {balanced:'⚖ Сбаланс.',aggressive:'🗡 Агрессивная',defensive:'🛡 Защитная',support:'💠 Поддержка'};
@@ -74,25 +89,39 @@ async function api(path, body={}){
 }
 async function refresh(){ STATE = await api('/api/menu/state'); render(); }
 window.setTab = id => { tab = id; render(); };
+window.setEnc = id => { enc_tab = id; render(); };
 window.act = async (action, params={}) => { await api('/api/menu/action', {action, params}); await refresh(); };
+window.genImg = async (type, id) => {
+  tg.showAlert ? null : null;
+  const r = await api('/api/gen_entity_image', {entity_type: type, id: id});
+  if(r.ok){ await refresh(); } else { tg.showAlert('🎨 ' + (r.error || 'ошибка генерации')); }
+};
 const card = (t,b) => `<div class="card"><h3>${t}</h3>${b}</div>`;
+const img = (src) => src ? `<img src="${API_BASE}${src}">` : `<img src="avatar.jpg" style="opacity:.3">`;
 
 function render(){
   document.getElementById('nav').innerHTML =
     NAV.map(t=>`<button class="${t.id===tab?'active':''}" onclick="setTab('${t.id}')"><span class="ic">${t.ic}</span>${t.t}</button>`).join('');
   const el = id => document.getElementById(id);
   const ok = STATE && STATE.ok;
-  el('hello').textContent = `Привет, ${(tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) || 'Женя'}!`;
-  el('chips').innerHTML = ok
-    ? `<span class="chip">⭐ Ур. ${STATE.hero.level}</span><span class="chip">🪙 ${STATE.hero.gold}</span><span class="chip">❤️ ${STATE.hero.hp}/${STATE.hero.max_hp}</span><span class="chip">🌍 ${STATE.scenario_name}</span>`
-    : '<span class="chip">📡 Нет связи с игрой — бот и ngrok запущены?</span>';
+  if(ok){
+    const h = STATE.hero, sc = STATE.scenario;
+    el('scen_name').textContent = sc.name || 'LitRPG';
+    el('hello').textContent = `Привет, ${(tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) || 'Женя'}!`;
+    if(sc.image){ el('scen_img').src = API_BASE + sc.image; el('scen_bg').style.backgroundImage = `url(${API_BASE}${sc.image})`; }
+    el('chips').innerHTML =
+      `<span class="chip">⭐ Ур. ${h.level}</span><span class="chip">🪙 ${h.gold}</span>`+
+      `<span class="chip">❤️ ${h.hp}/${h.max_hp}</span><span class="chip">🌍 ${sc.name}</span>`;
+  } else {
+    el('chips').innerHTML = '<span class="chip">📡 Нет связи с игрой — бот и ngrok запущены?</span>';
+  }
 
   let html = '';
   if(tab === 'home'){
     html = '<div class="grid">' + MENU.map(m =>
       `<div class="item" onclick="setTab('${m.id}')"><div style="font-size:26px">${m.ic}</div><b>${m.t}</b><div class="muted">${m.d}</div></div>`).join('') + '</div>';
   } else if(!ok){
-    html = card('⚠️ Меню недоступно', '<div class="muted">Проверьте: 1) бот запущен; 2) ngrok поднят (логи бота: «ngrok поднят автоматически»); 3) API_BASE в menu.html совпадает с доменом ngrok.</div>');
+    html = card('⚠️ Меню недоступно', '<div class="muted">Проверьте: бот запущен, ngrok поднят, API_BASE верный.</div>');
   } else {
     const h = STATE.hero;
     if(tab === 'hero'){
@@ -129,6 +158,20 @@ function render(){
       html = (STATE.events && STATE.events.length) ? STATE.events.map(e => card('📖 ' + e.name,
         `<div class="muted">${(e.desc||'').slice(0,160)}</div><div class="muted">Статус: ${e.status}</div>`)).join('')
         : card('📖 События', '<div class="muted">Событий пока нет</div>');
+    }
+    if(tab === 'ency'){
+      const E = STATE.encyclopedia;
+      html = `<div class="tabs">
+        <button class="${enc_tab==='npcs'?'active':''}" onclick="setEnc('npcs')">👥 NPC</button>
+        <button class="${enc_tab==='items'?'active':''}" onclick="setEnc('items')">🎒 Предметы</button>
+        <button class="${enc_tab==='locations'?'active':''}" onclick="setEnc('locations')">🗺️ Локации</button>
+      </div>`;
+      const list = E[enc_tab] || [];
+      const type = {npcs:'npc', items:'item', locations:'location'}[enc_tab];
+      html += list.length ? list.map(x =>
+        `<div class="enc">${img(x.img)}<div class="t"><b>${x.name}</b><div class="muted">${x.meta||''}</div></div>
+         <button class="btn ghost" onclick="genImg('${type}',${x.id})">🎨</button></div>`).join('')
+        : card('📚 Энциклопедия', '<div class="muted">Пока пусто</div>');
     }
     if(tab === 'worlds'){
       html = STATE.scenarios.map(w => card(`${w.active?'✅ ':''}${w.name} (${w.genre})`,
