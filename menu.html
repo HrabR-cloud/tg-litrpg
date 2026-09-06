@@ -49,7 +49,7 @@ const TABS = [
   {id:'map',ic:'🗺️',t:'Карта'},{id:'combat',ic:'⚔️',t:'Бой'},{id:'worlds',ic:'🌍',t:'Миры'}
 ];
 const TACTICS = {balanced:'⚖ Сбаланс.',aggressive:'🗡 Агрессивная',defensive:'🛡 Защитная',support:'💠 Поддержка'};
-const API_BASE = 'https://github.com/HrabR-cloud/tg-litrpg.ngrok-free.app';
+const API_BASE = 'https://unexpired-pogo-splotchy.ngrok-free.dev';
 async function api(path, body={}){
   const r = await fetch(API_BASE + path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({init_data:INIT,...body})});
   return r.json();
