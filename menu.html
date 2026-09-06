@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>LitRPG Меню</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#0e0b16;--card:#1a1626;--accent:#7c4dff;--accent2:#b388ff;--text:#f3efff;--muted:#8a80a0}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px}
+header{background:linear-gradient(180deg,#7c4dff,#4a2b8f);padding:22px 16px 46px;text-align:center;border-radius:0 0 24px 24px}
+.avatar{width:82px;height:82px;border-radius:50%;background:#ffffff22;display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 10px;border:2px solid #ffffff55}
+h1{font-size:21px}
+.chips{display:flex;gap:7px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.chip{background:#00000044;border-radius:20px;padding:6px 12px;font-size:12px}
+nav{position:fixed;bottom:10px;left:10px;right:10px;background:#241d33f2;border-radius:20px;display:flex;justify-content:space-around;padding:7px 4px;backdrop-filter:blur(8px);box-shadow:0 6px 20px #00000088}
+nav button{background:none;border:none;color:var(--muted);font-size:10px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 6px;border-radius:12px}
+nav button .ic{font-size:19px}
+nav button.active{color:var(--accent2);background:#7c4dff22}
+section{padding:14px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px}
+.card h3{font-size:15px;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #ffffff0d;font-size:14px}
+.row:last-child{border:none}
+.btn{background:var(--accent);border:none;color:#fff;border-radius:12px;padding:8px 13px;font-size:13px;margin:4px 4px 0 0}
+.btn.ghost{background:#ffffff14}
+.bar{height:8px;border-radius:4px;background:#ffffff14;margin:4px 0}
+.bar>i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{background:#ffffff0d;border-radius:12px;padding:10px;font-size:13px}
+.muted{color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="avatar" id="avatar">🧙</div>
+  <h1 id="hello">Привет!</h1>
+  <div class="chips" id="chips"></div>
+</header>
+<section id="content"></section>
+<nav id="nav"></nav>
+<script>
+const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
+const INIT = tg.initData;
+let STATE = null, tab = 'hero';
+const TABS = [
+  {id:'hero',ic:'👤',t:'Персонаж'},{id:'inv',ic:'🎒',t:'Инвентарь'},{id:'quests',ic:'📜',t:'Квесты'},
+  {id:'map',ic:'🗺️',t:'Карта'},{id:'combat',ic:'⚔️',t:'Бой'},{id:'worlds',ic:'🌍',t:'Миры'}
+];
+const TACTICS = {balanced:'⚖ Сбаланс.',aggressive:'🗡 Агрессивная',defensive:'🛡 Защитная',support:'💠 Поддержка'};
+const API_BASE = 'https://github.com/HrabR-cloud/tg-litrpg.ngrok-free.app';
+async function api(path, body={}){
+  const r = await fetch(API_BASE + path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({init_data:INIT,...body})});
+  return r.json();
+}
+async function refresh(){ STATE = await api('/api/menu/state'); render(); }
+window.setTab = id => { tab=id; render(); };
+window.act = async (action, params={}) => { await api('/api/menu/action',{action,params}); await refresh(); };
+const card=(t,b)=>`<div class="card"><h3>${t}</h3>${b}</div>`;
+function render(){
+  document.getElementById('nav').innerHTML =
+    TABS.map(t=>`<button class="${t.id===tab?'active':''}" onclick="setTab('${t.id}')"><span class="ic">${t.ic}</span>${t.t}</button>`).join('');
+  const el=id=>document.getElementById(id);
+  if(!STATE||!STATE.ok){ el('content').innerHTML='<div class="card muted">Нет активной сессии. Создай мир в чате: /new</div>'; return; }
+  const s=STATE, h=s.hero;
+  el('hello').textContent = `Привет, ${(tg.initDataUnsafe.user&&tg.initDataUnsafe.user.first_name)||'Женя'}!`;
+  el('chips').innerHTML =
+    `<span class="chip">⭐ Ур. ${h.level}</span><span class="chip">🪙 ${h.gold}</span>`+
+    `<span class="chip">❤️ ${h.hp}/${h.max_hp}</span><span class="chip">🌍 ${s.scenario_name}</span>`;
+  let html='';
+  if(tab==='hero'){
+    html += card('❤️ Здоровье', `<div class="bar"><i style="width:${Math.round(h.hp/h.max_hp*100)}%"></i></div><div class="muted">${h.hp} / ${h.max_hp} · Репутация ${h.rep}</div>`);
+    html += card('📊 Статы', Object.entries(h.stats).map(([k,v])=>`<div class="row"><span>${k}</span><b>${v}</b></div>`).join(''));
+    html += card('🛡 Экипировка (ячейки)', Object.entries(h.equipped).length
+        ? Object.entries(h.equipped).map(([slot,name])=>`<div class="row"><span>${slot}: ${name}</span><button class="btn ghost" onclick="act('unequip',{slot:'${slot}'})">Снять</button></div>`).join('')
+        : '<div class="muted">Пусто</div>');
+  }
+  if(tab==='inv'){
+    html = s.inventory.length ? '<div class="grid">'+s.inventory.map(i=>
+      `<div class="item"><b>${i.name}</b> <span class="muted">x${i.qty}</span>`+
+      `<div class="muted">${i.slot||''} ${i.equipped?'⚔️':''}</div>`+
+      (i.slot==='consumable'?`<button class="btn" onclick="act('use_item',{inv:${i.inv}})">Исп.</button>`:'')+
+      ((i.slot&&i.slot!=='consumable'&&i.slot!=='quest')?`<button class="btn ghost" onclick="act('equip',{inv:${i.inv}})">Надеть</button>`:'')+
+      `</div>`).join('')+'</div>' : '<div class="card muted">Инвентарь пуст</div>';
+  }
+  if(tab==='quests'){
+    html = s.quests.length ? s.quests.map(q=>card('📜 '+q.name,
+      `<div class="muted">${(q.desc||'').slice(0,140)}</div><button class="btn ghost" onclick="act('quest_decline',{quest:${q.id}})">Отказаться</button>`)).join('')
+      : '<div class="card muted">Нет активных квестов</div>';
+  }
+  if(tab==='map'){
+    html = s.locations.map(l=>card(`${l.current?'📍 ':''}${l.safe?'🛡️ ':''}${l.name}`,
+      `<div class="muted">${(l.desc||'').slice(0,120)}</div>`+
+      (l.current?'<div class="muted">Вы здесь</div>':`<button class="btn" onclick="act('travel',{loc:${l.id}})">Переместиться</button>`))).join('')
+      || '<div class="card muted">Карта пуста</div>';
+  }
+  if(tab==='combat'){
+    html = card('⚔️ Тактика автобоя', Object.entries(TACTICS).map(([k,v])=>
+      `<button class="btn ${h.tactic===k?'':'ghost'}" onclick="act('tactic',{tactic:'${k}'})">${v}</button>`).join(' ')+
+      `<div class="muted" style="margin-top:8px">Стиль боя учитывается автобоем. Умения и зелья — в бою в чате.</div>`);
+  }
+  if(tab==='worlds'){
+    html = s.scenarios.map(w=>card(`${w.active?'✅ ':''}${w.name} (${w.genre})`,
+      w.active?'<div class="muted">Активный мир</div>':`<button class="btn" onclick="act('switch',{scenario:${w.id}})">Переключить</button>`)).join('');
+  }
+  el('content').innerHTML = html;
+}
+refresh();
+</script>
+</body>
+</html>
