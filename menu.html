@@ -60,7 +60,9 @@ section{padding:14px}
 <script>
 const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
 const INIT = tg.initData;
-const API_BASE = 'https://unexpired-pogo-splotchy.ngrok-free.dev';
+// КЛЮЧЕВОЕ: вне GitHub Pages все запросы идут в СВОЙ домен (same-origin, без CORS)
+const NGROK = 'https://unexpired-pogo-splotchy.ngrok-free.dev';
+const API_BASE = location.hostname.endsWith('github.io') ? NGROK : '';
 let STATE = null, tab = 'home';
 let enc_sub = 'scenario', enc_sel = null;
 
@@ -136,7 +138,7 @@ window.genImg = async (type,id) => {
 };
 const card=(t,b)=>`<div class="card"><h3>${t}</h3>${b}</div>`;
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const img=(src)=>src?`<img src="${API_BASE}${src}">`:`<img src="avatar.jpg" style="opacity:.3">`;
+const img=(src)=>src?`<img src="${API_BASE||''}${src}">`:`<img src="avatar.jpg" style="opacity:.3">`;
 
 window.trPrompt = async key => {
   const el = document.getElementById('ef_'+key); if(!el) return;
@@ -173,7 +175,7 @@ async function renderEnc(){
     const rec = g.rec, schema = SCHEMA[enc_sel.entity]||[];
     html += `<button class="btn ghost" onclick="encBack()">← К списку</button>
              <b style="margin-left:8px">${esc(rec.name||('#'+enc_sel.id))}</b>
-             ${rec.image_media_id?`<img src="${API_BASE}${rec.image_media_id}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;float:right">`:''}`;
+             ${rec.image_media_id?`<img src="${API_BASE||''}${rec.image_media_id}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;float:right">`:''}`;
     for(const [key,label,type,flag] of schema){
       const v = rec[key];
       if(type==='area'){
@@ -212,7 +214,7 @@ async function render(){
     const h = STATE.hero, sc = STATE.scenario;
     el('scen_name').textContent = sc.name || 'LitRPG';
     el('hello').textContent = `Привет, ${(tg.initDataUnsafe.user&&tg.initDataUnsafe.user.first_name)||'Женя'}!`;
-    if(sc.image){ el('scen_img').src = API_BASE + sc.image; el('scen_bg').style.backgroundImage = `url(${API_BASE}${sc.image})`; }
+    if(sc.image){ el('scen_img').src = (API_BASE||'') + sc.image; el('scen_bg').style.backgroundImage = `url(${API_BASE||''}${sc.image})`; }
     el('chips').innerHTML =
       `<span class="chip">⭐ Ур. ${h.level}</span><span class="chip">🪙 ${h.gold}</span>`+
       `<span class="chip">❤️ ${h.hp}/${h.max_hp}</span><span class="chip">🌍 ${sc.name}</span>`;
@@ -224,7 +226,7 @@ async function render(){
     html = '<div class="grid">' + MENU.map(m=>
       `<div class="item" onclick="setTab('${m.id}')"><div style="font-size:26px">${m.ic}</div><b>${m.t}</b><div class="muted">${m.d}</div></div>`).join('') + '</div>';
   } else if(!ok){
-    html = card('⚠️ Меню недоступно','<div class="muted">Проверьте: бот запущен, ngrok поднят, API_BASE верный.</div>');
+    html = card('⚠️ Меню недоступно','<div class="muted">Проверьте: бот запущен, ngrok поднят. При первом открытии нажмите «Visit Site» на странице ngrok.</div>');
   } else {
     const h = STATE.hero;
     if(tab==='hero'){
