@@ -57,7 +57,7 @@ section{padding:14px}
 <header>
   <div class="bg" id="scen_bg"></div>
   <div class="inner">
-    <div class="avatar"><img id="scen_img" src="avatar.jpg" alt=""></div>
+    <div class="avatar"><img id="scen_img" src="avatar.jpg" alt="" onerror="this.style.display='none'"></div>
     <h1 id="scen_name">LitRPG</h1>
     <div class="sub" id="hello"></div>
     <div class="chips" id="chips"></div>
@@ -94,7 +94,6 @@ const TACTICS={balanced:'⚖ Сбалансированная',aggressive:'🗡 
 const ENC_TABS=[{id:'scenario',ic:'🌍',t:'Мир'},{id:'location',ic:'🗺️',t:'Локации'},{id:'npc',ic:'👥',t:'NPC'},
  {id:'item',ic:'🎒',t:'Предметы'},{id:'cskill',ic:'⚔️',t:'Боевые ум.'},{id:'nskill',ic:'✨',t:'Мирные ум.'},
  {id:'effect',ic:'🧪',t:'Эффекты'},{id:'faction',ic:'🏰',t:'Фракции'}];
-// type: text/area/num/check/statsgrid
 const SCHEMA={
  scenario:[['name','Название','text'],['genre','Жанр','text'],['description','Описание мира','area'],
   ['greeting','Приветствие','area'],['image_prompt','Промт вида (EN)','area','img']],
@@ -127,9 +126,9 @@ window.setTab=async id=>{tab=id;enc_sel=null;itemSel=null;worldSel=null;await re
 window.setEncSub=async id=>{enc_sub=id;enc_sel=null;await render();};
 window.openEnc=async id=>{enc_sel={entity:enc_sub,id};await render();};
 window.encBack=async()=>{enc_sel=null;await render();};
-window.openItem=id=>{itemSel=STATE.inventory.find(i=>i.inv===id)||null;await render();};
+window.openItem=async id=>{itemSel=(STATE.inventory.find(i=>i.inv===id))||null;await render();};
 window.closeItem=async()=>{itemSel=null;await render();};
-window.openWorld=id=>{worldSel=STATE.scenarios.find(w=>w.id===id)||null;await render();};
+window.openWorld=async id=>{worldSel=(STATE.scenarios.find(w=>w.id===id))||null;await render();};
 window.closeWorld=async()=>{worldSel=null;await render();};
 window.act=async(a,p={})=>{await api('/api/menu/action',{action:a,params:p});itemSel=null;await refresh();};
 window.genImg=async(type,id)=>{const r=await api('/api/gen_entity_image',{entity_type:type,id});
@@ -144,7 +143,7 @@ function statsGrid(key,jsonStr){
   Object.entries(obj).map(([k,v])=>`<div><label>${ru(k)}</label><input class="in sg" data-sg="${key}" data-k="${k}" type="number" step="any" value="${esc(v)}" style="width:100%"></div>`).join('')+`</div>`;
 }
 window.trPrompt=async key=>{const el=document.getElementById('ef_'+key);if(!el)return;
- const r=await api('/api/translate',{text:el.value});if(r.ok){el.value=r.en;tg.showAlert('🇬 Переведено на английский');}};
+ const r=await api('/api/translate',{text:el.value});if(r.ok){el.value=r.en;tg.showAlert('🇬🇧 Переведено на английский');}};
 window.encSave=async()=>{
  const schema=SCHEMA[enc_sel.entity]||[];const fields={};
  for(const[key,,type]of schema){
@@ -167,7 +166,7 @@ async function renderEnc(){
   if(!g.ok)return html+card('❌','Запись не найдена');
   const rec=g.rec,schema=SCHEMA[enc_sel.entity]||[];
   html+=`<button class="btn ghost" onclick="encBack()">← К списку</button> <b style="margin-left:8px">${esc(rec.name||('#'+enc_sel.id))}</b>`;
-  if(rec.image_media_id)html+=imgTag(rec.image_media_id,72).replace('float','');
+  if(rec.image_media_id)html+=imgTag(rec.image_media_id,72);
   for(const[key,label,type,flag]of schema){
    const v=rec[key];
    if(type==='area'){html+=`<div class="muted">${label}</div><textarea id="ef_${key}" class="ta">${esc(v)}</textarea>`;
@@ -231,7 +230,7 @@ async function render(){
     html=card('🌍 '+w.name,`${imgTag(w.image,140)}<div class="muted" style="margin:8px 0">${esc(w.desc||'')}</div>
      ${w.active?'<div class="muted">✅ Активный мир</div>':`<button class="btn" onclick="act('switch',{scenario:${w.id}})">Сделать активным</button>`}
      <button class="btn ghost" onclick="closeWorld()">↩ Назад</button>`);}
-   else html=STATE.scenarios.map(w=>`<div class="wcard" onclick="openWorld(${w.id})">${imgTag(w.image,999).replace('width:999px;height:999px','width:100%;height:120px')}<b>${w.active?'✅ ':''}${w.name} (${w.genre})</b></div>`).join('');}
+   else html=STATE.scenarios.map(w=>`<div class="wcard" onclick="openWorld(${w.id})"><img src="${(API_BASE||'')+(w.image||'avatar.jpg')}" style="width:100%;height:120px;object-fit:cover;background:#ffffff14" onerror="this.style.opacity=.3"><b>${w.active?'✅ ':''}${w.name} (${w.genre})</b></div>`).join('');}
  }
  el('content').innerHTML=html;}
 refresh();
