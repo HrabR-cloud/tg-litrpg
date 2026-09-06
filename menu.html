@@ -10,7 +10,8 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px}
 header{background:linear-gradient(180deg,#7c4dff,#4a2b8f);padding:22px 16px 46px;text-align:center;border-radius:0 0 24px 24px}
-.avatar{width:82px;height:82px;border-radius:50%;background:#ffffff22;display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 10px;border:2px solid #ffffff55}
+.avatar{width:82px;height:82px;border-radius:50%;overflow:hidden;margin:0 auto 10px;border:2px solid #ffffff55;background:#ffffff22}
+.avatar img{width:100%;height:100%;object-fit:cover}
 h1{font-size:21px}
 .chips{display:flex;gap:7px;justify-content:center;margin-top:10px;flex-wrap:wrap}
 .chip{background:#00000044;border-radius:20px;padding:6px 12px;font-size:12px}
@@ -28,13 +29,14 @@ section{padding:14px}
 .bar{height:8px;border-radius:4px;background:#ffffff14;margin:4px 0}
 .bar>i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.item{background:#ffffff0d;border-radius:12px;padding:10px;font-size:13px}
+.item{background:#ffffff0d;border-radius:12px;padding:12px;font-size:13px;cursor:pointer}
+.item:active{background:#ffffff1a}
 .muted{color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
 <header>
-  <div class="avatar" id="avatar"><img src="avatar.jpg" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>
+  <div class="avatar"><img src="avatar.jpg" alt=""></div>
   <h1 id="hello">Привет!</h1>
   <div class="chips" id="chips"></div>
 </header>
@@ -43,66 +45,95 @@ section{padding:14px}
 <script>
 const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
 const INIT = tg.initData;
-let STATE = null, tab = 'hero';
-const TABS = [
-  {id:'hero',ic:'👤',t:'Персонаж'},{id:'inv',ic:'🎒',t:'Инвентарь'},{id:'quests',ic:'📜',t:'Квесты'},
-  {id:'map',ic:'🗺️',t:'Карта'},{id:'combat',ic:'⚔️',t:'Бой'},{id:'worlds',ic:'🌍',t:'Миры'}
+const API_BASE = 'https://unexpired-pogo-splotchy.ngrok-free.dev';
+let STATE = null, tab = 'home';
+
+const NAV = [
+  {id:'home',ic:'🏠',t:'Домой'},
+  {id:'hero',ic:'👤',t:'Персонаж'},
+  {id:'inv',ic:'🎒',t:'Инвентарь'},
+  {id:'map',ic:'🗺️',t:'Карта'},
+  {id:'worlds',ic:'🌍',t:'Миры'}
+];
+const MENU = [
+  {id:'hero',ic:'👤',t:'Персонаж',d:'Статы, эффекты, экипировка'},
+  {id:'inv',ic:'🎒',t:'Инвентарь',d:'Вещи: использовать / надеть'},
+  {id:'quests',ic:'📜',t:'Квесты',d:'Активные квесты'},
+  {id:'map',ic:'🗺️',t:'Карта',d:'Локации и перемещение'},
+  {id:'combat',ic:'⚔️',t:'Бой',d:'Тактика автобоя'},
+  {id:'events',ic:'📖',t:'События',d:'Сюжетная цепочка'},
+  {id:'worlds',ic:'🌍',t:'Миры',d:'Переключить сценарий'}
 ];
 const TACTICS = {balanced:'⚖ Сбаланс.',aggressive:'🗡 Агрессивная',defensive:'🛡 Защитная',support:'💠 Поддержка'};
-const API_BASE = 'https://unexpired-pogo-splotchy.ngrok-free.dev';
+
 async function api(path, body={}){
-  const r = await fetch(API_BASE + path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({init_data:INIT,...body})});
-  return r.json();
+  try{
+    const r = await fetch(API_BASE + path, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({init_data: INIT, ...body})});
+    return await r.json();
+  }catch(e){ return {ok:false, error:'network'}; }
 }
 async function refresh(){ STATE = await api('/api/menu/state'); render(); }
-window.setTab = id => { tab=id; render(); };
-window.act = async (action, params={}) => { await api('/api/menu/action',{action,params}); await refresh(); };
-const card=(t,b)=>`<div class="card"><h3>${t}</h3>${b}</div>`;
+window.setTab = id => { tab = id; render(); };
+window.act = async (action, params={}) => { await api('/api/menu/action', {action, params}); await refresh(); };
+const card = (t,b) => `<div class="card"><h3>${t}</h3>${b}</div>`;
+
 function render(){
   document.getElementById('nav').innerHTML =
-    TABS.map(t=>`<button class="${t.id===tab?'active':''}" onclick="setTab('${t.id}')"><span class="ic">${t.ic}</span>${t.t}</button>`).join('');
-  const el=id=>document.getElementById(id);
-  if(!STATE||!STATE.ok){ el('content').innerHTML='<div class="card muted">Нет активной сессии. Создай мир в чате: /new</div>'; return; }
-  const s=STATE, h=s.hero;
-  el('hello').textContent = `Привет, ${(tg.initDataUnsafe.user&&tg.initDataUnsafe.user.first_name)||'Женя'}!`;
-  el('chips').innerHTML =
-    `<span class="chip">⭐ Ур. ${h.level}</span><span class="chip">🪙 ${h.gold}</span>`+
-    `<span class="chip">❤️ ${h.hp}/${h.max_hp}</span><span class="chip">🌍 ${s.scenario_name}</span>`;
-  let html='';
-  if(tab==='hero'){
-    html += card('❤️ Здоровье', `<div class="bar"><i style="width:${Math.round(h.hp/h.max_hp*100)}%"></i></div><div class="muted">${h.hp} / ${h.max_hp} · Репутация ${h.rep}</div>`);
-    html += card('📊 Статы', Object.entries(h.stats).map(([k,v])=>`<div class="row"><span>${k}</span><b>${v}</b></div>`).join(''));
-    html += card('🛡 Экипировка (ячейки)', Object.entries(h.equipped).length
-        ? Object.entries(h.equipped).map(([slot,name])=>`<div class="row"><span>${slot}: ${name}</span><button class="btn ghost" onclick="act('unequip',{slot:'${slot}'})">Снять</button></div>`).join('')
-        : '<div class="muted">Пусто</div>');
-  }
-  if(tab==='inv'){
-    html = s.inventory.length ? '<div class="grid">'+s.inventory.map(i=>
-      `<div class="item"><b>${i.name}</b> <span class="muted">x${i.qty}</span>`+
-      `<div class="muted">${i.slot||''} ${i.equipped?'⚔️':''}</div>`+
-      (i.slot==='consumable'?`<button class="btn" onclick="act('use_item',{inv:${i.inv}})">Исп.</button>`:'')+
-      ((i.slot&&i.slot!=='consumable'&&i.slot!=='quest')?`<button class="btn ghost" onclick="act('equip',{inv:${i.inv}})">Надеть</button>`:'')+
-      `</div>`).join('')+'</div>' : '<div class="card muted">Инвентарь пуст</div>';
-  }
-  if(tab==='quests'){
-    html = s.quests.length ? s.quests.map(q=>card('📜 '+q.name,
-      `<div class="muted">${(q.desc||'').slice(0,140)}</div><button class="btn ghost" onclick="act('quest_decline',{quest:${q.id}})">Отказаться</button>`)).join('')
-      : '<div class="card muted">Нет активных квестов</div>';
-  }
-  if(tab==='map'){
-    html = s.locations.map(l=>card(`${l.current?'📍 ':''}${l.safe?'🛡️ ':''}${l.name}`,
-      `<div class="muted">${(l.desc||'').slice(0,120)}</div>`+
-      (l.current?'<div class="muted">Вы здесь</div>':`<button class="btn" onclick="act('travel',{loc:${l.id}})">Переместиться</button>`))).join('')
-      || '<div class="card muted">Карта пуста</div>';
-  }
-  if(tab==='combat'){
-    html = card('⚔️ Тактика автобоя', Object.entries(TACTICS).map(([k,v])=>
-      `<button class="btn ${h.tactic===k?'':'ghost'}" onclick="act('tactic',{tactic:'${k}'})">${v}</button>`).join(' ')+
-      `<div class="muted" style="margin-top:8px">Стиль боя учитывается автобоем. Умения и зелья — в бою в чате.</div>`);
-  }
-  if(tab==='worlds'){
-    html = s.scenarios.map(w=>card(`${w.active?'✅ ':''}${w.name} (${w.genre})`,
-      w.active?'<div class="muted">Активный мир</div>':`<button class="btn" onclick="act('switch',{scenario:${w.id}})">Переключить</button>`)).join('');
+    NAV.map(t=>`<button class="${t.id===tab?'active':''}" onclick="setTab('${t.id}')"><span class="ic">${t.ic}</span>${t.t}</button>`).join('');
+  const el = id => document.getElementById(id);
+  const ok = STATE && STATE.ok;
+  el('hello').textContent = `Привет, ${(tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) || 'Женя'}!`;
+  el('chips').innerHTML = ok
+    ? `<span class="chip">⭐ Ур. ${STATE.hero.level}</span><span class="chip">🪙 ${STATE.hero.gold}</span><span class="chip">❤️ ${STATE.hero.hp}/${STATE.hero.max_hp}</span><span class="chip">🌍 ${STATE.scenario_name}</span>`
+    : '<span class="chip">📡 Нет связи с игрой — бот и ngrok запущены?</span>';
+
+  let html = '';
+  if(tab === 'home'){
+    html = '<div class="grid">' + MENU.map(m =>
+      `<div class="item" onclick="setTab('${m.id}')"><div style="font-size:26px">${m.ic}</div><b>${m.t}</b><div class="muted">${m.d}</div></div>`).join('') + '</div>';
+  } else if(!ok){
+    html = card('⚠️ Меню недоступно', '<div class="muted">Проверьте: 1) бот запущен; 2) ngrok поднят (логи бота: «ngrok поднят автоматически»); 3) API_BASE в menu.html совпадает с доменом ngrok.</div>');
+  } else {
+    const h = STATE.hero;
+    if(tab === 'hero'){
+      html += card('❤️ Здоровье', `<div class="bar"><i style="width:${Math.round(h.hp/h.max_hp*100)}%"></i></div><div class="muted">${h.hp} / ${h.max_hp} · Репутация ${h.rep}</div>`);
+      html += card('📊 Статы', Object.entries(h.stats).map(([k,v])=>`<div class="row"><span>${k}</span><b>${v}</b></div>`).join(''));
+      html += card('🛡 Экипировка (ячейки)', Object.keys(h.equipped).length
+        ? Object.entries(h.equipped).map(([s,n])=>`<div class="row"><span>${s}: ${n}</span><button class="btn ghost" onclick="act('unequip',{slot:'${s}'})">Снять</button></div>`).join('')
+        : '<div class="muted">Пусто — откройте сумку 🎒</div>');
+    }
+    if(tab === 'inv'){
+      html = STATE.inventory.length ? '<div class="grid">' + STATE.inventory.map(i =>
+        `<div class="item"><b>${i.name}</b> <span class="muted">x${i.qty}</span><div class="muted">${i.slot||''} ${i.equipped?'⚔️':''}</div>` +
+        (i.slot==='consumable' ? `<button class="btn" onclick="act('use_item',{inv:${i.inv}})">Исп.</button>` : '') +
+        ((i.slot && i.slot!=='consumable' && i.slot!=='quest') ? `<button class="btn ghost" onclick="act('equip',{inv:${i.inv}})">Надеть</button>` : '') +
+        `</div>`).join('') + '</div>' : card('🎒 Инвентарь', '<div class="muted">Пусто</div>');
+    }
+    if(tab === 'quests'){
+      html = STATE.quests.length ? STATE.quests.map(q => card('📜 ' + q.name,
+        `<div class="muted">${(q.desc||'').slice(0,160)}</div><button class="btn ghost" onclick="act('quest_decline',{quest:${q.id}})">Отказаться</button>`)).join('')
+        : card('📜 Квесты', '<div class="muted">Нет активных квестов</div>');
+    }
+    if(tab === 'map'){
+      html = STATE.locations.map(l => card(`${l.current?'📍 ':''}${l.safe?'🛡️ ':''}${l.name}`,
+        `<div class="muted">${(l.desc||'').slice(0,120)}</div>` +
+        (l.current ? '<div class="muted">Вы здесь</div>' : `<button class="btn" onclick="act('travel',{loc:${l.id}})">Переместиться</button>`))).join('')
+        || card('🗺️ Карта', '<div class="muted">Пусто</div>');
+    }
+    if(tab === 'combat'){
+      html = card('⚔️ Тактика автобоя', Object.entries(TACTICS).map(([k,v]) =>
+        `<button class="btn ${h.tactic===k?'':'ghost'}" onclick="act('tactic',{tactic:'${k}'})">${v}</button>`).join(' ') +
+        `<div class="muted" style="margin-top:8px">Стиль боя учитывается автобоем. Зелья и умения — в бою в чате.</div>`);
+    }
+    if(tab === 'events'){
+      html = (STATE.events && STATE.events.length) ? STATE.events.map(e => card('📖 ' + e.name,
+        `<div class="muted">${(e.desc||'').slice(0,160)}</div><div class="muted">Статус: ${e.status}</div>`)).join('')
+        : card('📖 События', '<div class="muted">Событий пока нет</div>');
+    }
+    if(tab === 'worlds'){
+      html = STATE.scenarios.map(w => card(`${w.active?'✅ ':''}${w.name} (${w.genre})`,
+        w.active ? '<div class="muted">Активный мир</div>' : `<button class="btn" onclick="act('switch',{scenario:${w.id}})">Переключить</button>`)).join('');
+    }
   }
   el('content').innerHTML = html;
 }
