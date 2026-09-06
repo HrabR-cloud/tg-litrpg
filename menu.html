@@ -62,7 +62,7 @@ const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
 const INIT = tg.initData;
 const API_BASE = 'https://unexpired-pogo-splotchy.ngrok-free.dev';
 let STATE = null, tab = 'home';
-let enc_sub = 'scenario', enc_sel = null;   // энциклопедия: раздел и открытая запись
+let enc_sub = 'scenario', enc_sel = null;
 
 const NAV = [
   {id:'home',ic:'🏠',t:'Домой'},{id:'hero',ic:'👤',t:'Герой'},{id:'inv',ic:'🎒',t:'Вещи'},
@@ -85,7 +85,6 @@ const ENC_TABS = [
   {id:'item',ic:'🎒',t:'Предметы'},{id:'cskill',ic:'⚔️',t:'Боевые ум.'},{id:'nskill',ic:'✨',t:'Мирные ум.'},
   {id:'effect',ic:'🧪',t:'Эффекты'},{id:'faction',ic:'🏰',t:'Фракции'}
 ];
-// Схемы форм: [ключ, подпись, тип(text/area/num/check), флаг(img)]
 const SCHEMA = {
   scenario: [['name','Название','text'],['genre','Жанр','text'],
     ['description','Описание мира','area'],['greeting','Приветствие','area'],
@@ -119,7 +118,8 @@ const GEN_MAP = {scenario:'scenario', location:'location', npc:'npc', item:'item
 
 async function api(path, body={}){
   try{
-    const r = await fetch(API_BASE + path, {method:'POST', headers:{'Content-Type':'application/json'},
+    const r = await fetch(API_BASE + path, {method:'POST',
+      headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'true'},
       body: JSON.stringify({init_data: INIT, ...body})});
     return await r.json();
   }catch(e){ return {ok:false, error:'network'}; }
@@ -138,7 +138,6 @@ const card=(t,b)=>`<div class="card"><h3>${t}</h3>${b}</div>`;
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const img=(src)=>src?`<img src="${API_BASE}${src}">`:`<img src="avatar.jpg" style="opacity:.3">`;
 
-// ---------- ЭНЦИКЛОПЕДИЯ ----------
 window.trPrompt = async key => {
   const el = document.getElementById('ef_'+key); if(!el) return;
   const r = await api('/api/translate',{text: el.value});
@@ -150,7 +149,7 @@ window.encSave = async () => {
   for(const [key,,type] of schema){
     const el = document.getElementById('ef_'+key); if(!el) continue;
     let v = (type==='check') ? (el.checked?1:0) : el.value;
-    if(type==='area' && key.includes('modif') || (type==='area' && key.includes('stats'))){
+    if(type==='area' && (key.includes('modif') || key.includes('stats'))){
       try{ JSON.parse(v||'{}'); }catch(e){ tg.showAlert('❌ JSON некорректен: '+key); return; }
     }
     fields[key]=v;
@@ -204,7 +203,6 @@ async function renderEnc(){
   return html;
 }
 
-// ---------- ОСНОВНОЙ РЕНДЕР ----------
 async function render(){
   document.getElementById('nav').innerHTML =
     NAV.map(t=>`<button class="${t.id===tab?'active':''}" onclick="setTab('${t.id}')"><span class="ic">${t.ic}</span>${t.t}</button>`).join('');
