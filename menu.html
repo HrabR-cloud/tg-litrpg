@@ -52,6 +52,9 @@ section{padding:14px}
 .wcard{background:#ffffff0d;border-radius:14px;overflow:hidden;margin-bottom:12px;cursor:pointer;text-align:center}
 .wcard img{width:100%;height:120px;object-fit:cover;background:#ffffff14}
 .wcard b{display:block;padding:10px}
+.time-clock{font-size:42px;font-weight:700;text-align:center;letter-spacing:2px;margin:8px 0}
+.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.cal-pre{background:#ffffff0d;border-radius:10px;padding:10px;font-size:12px;line-height:1.5;overflow-x:auto;white-space:pre}
 </style>
 </head>
 <body>
@@ -74,6 +77,7 @@ const NGROK = 'https://unexpired-pogo-splotchy.ngrok-free.dev';
 const API_BASE = location.hostname.endsWith('github.io') ? NGROK : '';
 let STATE=null, tab='home', enc_sub='scenario', enc_sel=null, editCtx=null;
 let itemSel=null, worldSel=null, locSel=null, heroEdit=false, IMG_V=1, ARB_LOG=[];
+let TIME_STATE=null;
 
 const STAT_RU = {strength:'Сила', magic_power:'Магическая сила', intelligence:'Интеллект',
  health:'Здоровье', max_health:'Макс. здоровье', speed:'Скорость', armor:'Броня', magic:'Магия',
@@ -89,7 +93,8 @@ const QUAL_RU = {1:'Ржавый',2:'Обычный',3:'Качественный
 const STATUS_RU = {not_done:'Не начато', in_progress:'В процессе', completed:'Завершено'};
 
 const NAV=[{id:'home',ic:'🏠',t:'Домой'},{id:'hero',ic:'👤',t:'Герой'},{id:'inv',ic:'🎒',t:'Вещи'},
- {id:'map',ic:'🗺️',t:'Карта'},{id:'time',ic:'⏰',t:'Время'},{id:'relations',ic:'💞',t:'Отношения'},{id:'ency',ic:'📚',t:'Энцикл.'},{id:'arbiter',ic:'⚖️',t:'Арбитр'},{id:'worlds',ic:'🌍',t:'Миры'}];
+ {id:'map',ic:'🗺️',t:'Карта'},{id:'time',ic:'⏰',t:'Время'},{id:'relations',ic:'💞',t:'Отношения'},
+ {id:'ency',ic:'📚',t:'Энцикл.'},{id:'arbiter',ic:'⚖️',t:'Арбитр'},{id:'worlds',ic:'🌍',t:'Миры'}];
 const MENU=[{id:'hero',ic:'👤',t:'Персонаж',d:'Имя, пол, статы, внешность'},
  {id:'inv',ic:'🎒',t:'Инвентарь',d:'Карточки вещей с миниатюрами'},
  {id:'quests',ic:'📜',t:'Квесты',d:'Активные квесты'},{id:'map',ic:'🗺️',t:'Карта',d:'Локации и перемещение'},
@@ -154,17 +159,34 @@ window.genImg=async(type,id)=>{const r=await api('/api/gen_entity_image',{entity
 window.resetWorld=async(id)=>{
  let ok=false;
  try{ok=await new Promise(res=>tg.showConfirm({title:'Сбросить мир?',
-  message:'Удалятся: квесты, события, именные NPC, локации (кроме стартовой), предметы (кроме бутылей), инвентарь. Герой вернётся к 1 ур. Генерация мира продолжится под руководством Арбитра.'},r=>res(r)));}
+  message:'Удалятся: квесты, события, именные NPC, локации (кроме стартовой), предметы (кроме бутылей), инвентарь. Герой вернётся к 1 ур.'},r=>res(r)));}
  catch(e){ok=confirm('Сбросить мир?');}
  if(!ok)return;
  const r=await api('/api/reset_world',{scenario_id:id});
- tg.showAlert(r.ok?'♻️ Мир сброшен. Попроси Арбитра создать локации, NPC и события.':'❌ '+(r.error||'ошибка'));
+ tg.showAlert(r.ok?'♻️ Мир сброшен.':'❌ '+(r.error||'ошибка'));
  await refresh();};
 window.arbSend=async()=>{const el=document.getElementById('arb_in');const t=el.value.trim();if(!t)return;
  el.value='';ARB_LOG.push({q:t,a:'⏳ Арбитр думает...'});await render();
  const r=await api('/api/arbiter',{text:t});
  ARB_LOG[ARB_LOG.length-1].a=r.ok?(r.reply||'Готово.'):'❌ '+(r.error||'ошибка');
  await render();};
+
+/* === ТЗ §15 R-04: перемотка времени === */
+window.advanceTime=async(mins)=>{
+ const r=await api('/api/advance_time',{minutes:mins});
+ if(r.ok){TIME_STATE=r;await render();}
+ else tg.showAlert('❌ '+(r.error||'ошибка'));};
+window.rewindTime=async(target)=>{
+ const r=await api('/api/menu/time/rewind',{target});
+ if(r.ok){TIME_STATE=r;await render();}
+ else tg.showAlert('❌ '+(r.error||'ошибка'));};
+window.rewindExact=async()=>{
+ const el=document.getElementById('time_exact');if(!el)return;
+ const parts=el.value.split(':');if(parts.length!==2)return;
+ const r=await api('/api/menu/time/rewind',{hour:parseInt(parts[0]),minute:parseInt(parts[1])});
+ if(r.ok){TIME_STATE=r;await render();}
+ else tg.showAlert('❌ '+(r.error||'ошибка'));};
+
 const card=(t,b)=>`<div class="card"><h3>${t}</h3>${b}</div>`;
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const thumbOf=s=>s&&s.includes('/media/images/')?s.replace('/media/images/','/media/images/thumbs/'):s;
@@ -246,6 +268,39 @@ async function renderEnc(){
  }else html+=card('📚','Раздел пуст.');
  return html;}
 
+/* === ТЗ §15 R-04: рендер вкладки «⏰ Время» === */
+async function renderTime(){
+ if(!TIME_STATE){TIME_STATE=await api('/api/time',{});}
+ const t=TIME_STATE;
+ if(!t||!t.ok)return card('⏰ Время','<div class="muted">Нет связи или нет сценария</div>');
+ let html=card('⏰ Текущее время',`
+  <div class="time-clock">${t.time||'--:--'}</div>
+  <div style="text-align:center;font-size:15px">${t.day_of_week||''}, ${t.date||''}</div>
+  <div class="row"><span>🍂 Сезон</span><b>${t.season||'—'}</b></div>
+  <div class="row"><span>🌤 Погода</span><b>${t.weather||'—'}</b></div>
+  <div class="row"><span>🌡 Температура</span><b>${t.temperature!=null?t.temperature+'°C':'—'}</b></div>
+  ${t.holiday?`<div class="row"><span>🎉 Праздник</span><b>${t.holiday}</b></div>`:''}`);
+ html+=card('⏩ Быстрые переходы',`
+  <div class="time-grid">
+   <button class="btn" onclick="rewindTime('today_evening')">🌆 Сегодня 18:00</button>
+   <button class="btn" onclick="rewindTime('today_night')">🌙 Сегодня 22:00</button>
+   <button class="btn" onclick="rewindTime('tomorrow_morning')">🌅 Завтра 08:00</button>
+   <button class="btn" onclick="rewindTime('tomorrow_evening')">🌇 Завтра 19:00</button>
+  </div>
+  <div class="time-grid" style="margin-top:8px">
+   <button class="btn ghost" onclick="advanceTime(60)">+1 час</button>
+   <button class="btn ghost" onclick="advanceTime(480)">+8 часов</button>
+   <button class="btn ghost" onclick="advanceTime(1440)">+1 день</button>
+   <button class="btn ghost" onclick="advanceTime(10080)">+1 неделя</button>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+   <input id="time_exact" class="in" type="time" value="12:00" style="width:130px">
+   <button class="btn" onclick="rewindExact()">⏱ Перейти</button>
+  </div>`);
+ if(t.calendar){html+=card('📅 Календарь',`<div class="cal-pre">${esc(t.calendar)}</div>`);}
+ return html;
+}
+
 async function render(){
  document.getElementById('nav').innerHTML=NAV.map(t=>
   `<button class="${t.id===tab?'active':''}" onclick="setTab('${t.id}')"><span class="ic">${t.ic}</span>${t.t}</button>`).join('');
@@ -262,7 +317,7 @@ async function render(){
  }else{el('hero_name').textContent='';el('chips').innerHTML='<span class="chip">📡 Нет связи с игрой — бот и ngrok запущены?</span>';}
  let html='';
  if(tab==='home'){html='<div class="grid">'+MENU.map(m=>`<div class="item" onclick="setTab('${m.id}')"><div style="font-size:26px">${m.ic}</div><b>${m.t}</b><div class="muted">${m.d}</div></div>`).join('')+'</div>';}
- else if(!ok){html=card('⚠️ Меню недоступно','<div class="muted">Проверьте: бот запущен, ngrok поднят. При первом открытии нажмите «Visit Site».</div>');}
+ else if(!ok){html=card('⚠️ Меню недоступно','<div class="muted">Проверьте: бот запущен, ngrok поднят.</div>');}
  else{const h=STATE.hero;
   if(tab==='hero'){
    if(heroEdit){html+=await editorHtml('hero',h.id);}
@@ -294,6 +349,19 @@ async function render(){
   }
   if(tab==='quests'){html=STATE.quests.length?STATE.quests.map(q=>card('📜 '+q.name,`<div class="muted">${(q.desc||'').slice(0,160)}</div><button class="btn ghost" onclick="act('quest_decline',{quest:${q.id}})">Отказаться</button>`)).join(''):card('📜 Квесты','<div class="muted">Нет активных квестов</div>');}
   if(tab==='map'){html=STATE.locations.map(l=>card(`${l.current?'📍 ':''}${l.safe?'🛡️ ':''}${l.name}`,`${imgTag(l.image,64)}<div class="muted">${(l.desc||'').slice(0,120)}</div><div class="muted">${Object.entries(l.effects||{}).map(([k,v])=>`${ru(k)} ${v}`).join(' · ')||'Без особенностей'}</div>`+(l.current?'<div class="muted">Вы здесь</div>':`<button class="btn" onclick="act('travel',{loc:${l.id}})">Переместиться</button>`))).join('')||card('🗺️ Карта','<div class="muted">Пусто</div>');}
+  if(tab==='time'){html=await renderTime();}
+  if(tab==='relations'){
+   const relsResp=await api('/api/relationships',{});
+   if(relsResp.ok&&relsResp.relationships&&relsResp.relationships.length>0){
+    html=relsResp.relationships.map(r=>card(`💞 ${r.name}`,`
+     <div class="row"><span>Тип</span><b>${r.type||'—'}</b></div>
+     <div class="row"><span>Теплота</span><b>${r.warmth}</b></div>
+     <div class="row"><span>Близость</span><b>${r.intimacy}</b></div>
+     <div class="row"><span>Страсть</span><b>${r.passion}</b></div>
+     <div class="row"><span>Обязательства</span><b>${r.commitment}</b></div>
+     <div class="row"><span>Конфликт</span><b>${r.conflict}</b></div>`)).join('');
+   }else html=card('💞 Отношения','<div class="muted">Пока нет отношений с NPC</div>');
+  }
   if(tab==='arbiter'){
    html=ARB_LOG.map(e=>`<div class="card"><div class="muted">Вы: ${esc(e.q)}</div><div style="margin-top:6px">${esc(e.a).replace(/\n/g,'<br>')}</div></div>`).join('');
    html+=`<div class="card"><textarea id="arb_in" class="ta" placeholder="Спроси Арбитра: создать локацию, NPC, расу, фракцию, эффект, предмет; изменить или удалить запись..."></textarea>
@@ -310,45 +378,6 @@ async function render(){
      <button class="btn ghost" onclick="closeWorld()">↩ Назад в меню</button></div>`);}
    else html=STATE.scenarios.map(w=>`<div class="wcard" onclick="openWorld(${w.id})"><img src="${(API_BASE||'')+thumbOf(w.image||'avatar.jpg')}?v=${IMG_V}" onerror="this.onerror=null;this.src=this.src.replace('/thumbs/','')" style="width:100%;height:120px;object-fit:cover;background:#ffffff14"><b>${w.active?'✅ ':''}${w.name} (${w.genre})</b></div>`).join('');}
  }
-   if(tab==='time'){
-    const timeResp = await api('/api/time', {});
-    if(timeResp.ok){
-      html = card('⏰ Текущее время', `
-        <div style="text-align:center;font-size:18px;margin:10px 0">${timeResp.display}</div>
-        <div class="muted" style="text-align:center">Сезон: ${timeResp.season} · Погода: ${timeResp.weather} · ${timeResp.temperature}°C</div>
-        <div style="margin-top:15px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <button class="btn" onclick="advanceTime(60)">+1 час</button>
-          <button class="btn" onclick="advanceTime(480)">+8 часов</button>
-          <button class="btn" onclick="advanceTime(1440)">+1 день</button>
-          <button class="btn" onclick="advanceTime(10080)">+1 неделя</button>
-        </div>
-      `);
-    } else {
-      html = card('⏰ Время', 'Не установлено');
-    }
-  }
-
-  if(tab==='relations'){
-    const relsResp = await api('/api/relationships', {});
-    if(relsResp.ok && relsResp.relationships.length > 0){
-      html = card(' Отношения', relsResp.relationships.map(r => `
-        <div class="enc" onclick="showRelation(${r.npc_id})">
-          <div class="t">
-            <b>${r.name}</b>
-            <div class="muted">${r.type || 'Неизвестно'} · Теплота: ${r.warmth}</div>
-            <div style="margin-top:4px">
-              <span class="chip">Близость: ${r.intimacy}</span>
-              <span class="chip">Страсть: ${r.passion}</span>
-              <span class="chip">Обязательства: ${r.commitment}</span>
-              <span class="chip">Конфликт: ${r.conflict}</span>
-            </div>
-          </div>
-        </div>
-      `).join(''));
-    } else {
-      html = card('💞 Отношения', 'Пока нет отношений с NPC');
-    }
-  }
  el('content').innerHTML=html;}
 window.trHeroPrompt=async()=>{const el=document.getElementById('hero_prompt');if(!el)return;
  const r=await api('/api/translate',{text:el.value});if(r.ok){el.value=r.en;tg.showAlert('🇬🇧 Переведено');}};
