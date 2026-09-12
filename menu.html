@@ -1,392 +1,434 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LitRPG Меню</title>
-<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=lPugRWakxsF8pPX_7xpuyMHVauirJ5pE8Qh2WKcMXjZWJyv3ufnhpMu-_ah9QRW1jIqxXujol3f05OPrsH5IAbdEqW43f8_WrRoFHqhDysA0J8T8f86iTW64m3Tx__w3XkeOQhgYTWJjHwHYK0-wEQyFie86IkgWb9lVpQ7YSqL0jOfs7ErY6P_MRnRdLnSN94nleqGrkFeSxgYC2ljhzBs8p2NLJ8pX8qNAL6Nfz4JUpIsaKEdqVxjNqX6VRlUa9APNp2gcaP684-XKwLShLXDr95FyJmxE-eStu0qEyx2-iTMuJPoQXEKOZ3yNRmtkjuuhVx5gEOvH-SIh8cM8zZPvRDo-INsvmoDJq2kWSVR3BskSGZmvv8hNSBVMgeM5IZPvYwLWdcwGmqcG6mgi14MCqEbk2CF_cnKeAsSe7RShkWqx4DEbYv5m5W52JGdMY1gKstr1GMWdnZ80Fwb8KwEGU7DOmmRP6KfMZq9Fb_CbJkvhqz6gXVK4ZRp2h8Aq9be7uETtUgIG72Fk0NSzwdHTplnvXDH4ni7odAaAaky7vGNqe6HwUs-wkQvsOEAU18c99mzb8UTogtaSzmMCzi2Dkw7eHTM-khNLm05YDw4lNEkey4d4msYdt44A8Xi1-mQ5iMyH4V-kWaaqKaRb-PcueFz6B8_7wKwzjSxQtGJkpEcjqcS5vXptXxYvKJDXRceJ7Fl5-JTakil8TRi8zjITtoNVO0znfgCt9yxHU6T5uuyUPEmpKoGIoeWbVjnep1bih8PdPy5ZtY-Mf1MZOASIHuhnBqplEw8jZ4Ib_kZetd1dduSM8Uso7sQ6qM6MeQp6_TqegIx4_Ht_jUdCpRqQMFBoWWtGxgAE8P3sYbqpPGqKE6TR4VyQNRub4HSx1cxKRfo_QxVbp3HXG4MzJ2VzOt__hW4N-Iei8o-9DlVLyVACqsrsalC1RbODOKwvEs8J6eaEUtx6ZAbOm3LKVXZcLNT9PfpuslEhT9DxrOG-5_AiT8NDPQ1F1mDS2BDsDvI-xs8S3LsomAcSeG_ffZwwPNj1Y2bZDsK78A1ToSdneiyn0iEJvTfndJ2KCuUfG9BlEFGJTXSq2m9sCU7DFJPTqrcY3eejWMoki10Skua5pk8twpU0cmfvzorbb_eKvViPiy5dVQNJBOyHZESMtBRLEur7ArGEZN0AKbFSQ71g_ljoSR-UfV2h7VG3QORmdcCGdnjPSWAl7rkxvCWDiiiV4Kjsp5UlDWMTEkYCfvQs0XZ2iCHRMuMgnG5Rjc7qD4eC6YoAOixqFtyHh3BbhioJT8wUxF7ISkNWcVgiuiQJ5_ZS6r6Bejk85aeuOuZnHvhn_dISt7FjwsX7kz5iayiP3uoDP8VH5aneI8OzyAHvb2UGVVsis1hiUhPdoZtZ_r8vRm-UWK29pWsJgNMRLNh7eDdXlWQ6GVwVI4hoJwbTwh-l-R3Imp7dZVlF3utRnY_g25cF98JBb1vdnIrhng" charset="UTF-8"></script><script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--card:#241546cc;--accent:#7c4dff;--accent2:#b388ff;--text:#f3efff;--muted:#9d8fc0}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,system-ui,sans-serif;color:var(--text);padding-bottom:80px;
-  background:linear-gradient(180deg,#2a1650 0%,#1b0f38 45%,#120a26 100%);background-attachment:fixed}
-header{position:relative;background:linear-gradient(180deg,#7c4dff,#4a2b8f);padding:22px 16px 40px;text-align:center;border-radius:0 0 24px 24px;overflow:hidden}
-header .bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.4;filter:blur(2px)}
-header .inner{position:relative}
-.avatar{width:86px;height:86px;border-radius:50%;overflow:hidden;margin:0 auto 10px;border:2px solid #ffffff66;background:#ffffff22}
-.avatar img{width:100%;height:100%;object-fit:cover}
-h1{font-size:20px}
-.sub{font-size:12px;opacity:.85;margin-top:4px}
-.chips{display:flex;gap:7px;justify-content:center;margin-top:10px;flex-wrap:wrap}
-.chip{background:#00000044;border-radius:20px;padding:6px 12px;font-size:12px}
-.herobar{padding:10px 14px;font-size:16px;background:#ffffff0d;border-bottom:1px solid #ffffff0d}
-nav{position:fixed;bottom:10px;left:10px;right:10px;background:#241d33f2;border-radius:20px;display:flex;justify-content:space-around;padding:7px 2px;backdrop-filter:blur(8px);box-shadow:0 6px 20px #00000088}
-nav button{background:none;border:none;color:var(--muted);font-size:9px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 4px;border-radius:12px}
-nav button .ic{font-size:18px}
-nav button.active{color:var(--accent2);background:#7c4dff22}
-section{padding:14px}
-.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px}
-.card h3{font-size:15px;margin-bottom:8px}
-.row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #ffffff0d;font-size:14px}
-.row:last-child{border:none}
-.btn{background:var(--accent);border:none;color:#fff;border-radius:12px;padding:8px 13px;font-size:13px;margin:4px 4px 0 0}
-.btn.ghost{background:#ffffff14}
-.btn.danger{background:#8f2b3a}
-.bar{height:8px;border-radius:4px;background:#ffffff14;margin:4px 0}
-.bar>i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.item{background:#ffffff0d;border-radius:12px;padding:12px;font-size:13px;cursor:pointer}
-.item:active{background:#ffffff1a}
-.muted{color:var(--muted);font-size:12px}
-.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.tabs button{background:#ffffff0d;border:none;color:var(--muted);border-radius:12px;padding:8px 8px;font-size:11px}
-.tabs button.active{background:var(--accent);color:#fff}
-.ta{width:100%;min-height:70px;background:#ffffff0d;border:1px solid #ffffff14;border-radius:10px;color:var(--text);padding:8px;font-size:13px;margin:4px 0}
-.in{background:#ffffff0d;border:1px solid #ffffff14;border-radius:10px;color:var(--text);padding:6px 8px;width:110px;font-size:13px}
-.enc{display:flex;gap:10px;align-items:center;background:#ffffff0d;border-radius:12px;padding:10px;margin-bottom:10px;cursor:pointer}
-.enc img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:#ffffff14}
-.enc .t{flex:1}
-.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin:6px 0}
-.statgrid label{font-size:12px;color:var(--muted)}
-.statgrid input{width:100%}
-.wcard{background:#ffffff0d;border-radius:14px;overflow:hidden;margin-bottom:12px;cursor:pointer;text-align:center}
-.wcard img{width:100%;height:120px;object-fit:cover;background:#ffffff14}
-.wcard b{display:block;padding:10px}
-.time-clock{font-size:42px;font-weight:700;text-align:center;letter-spacing:2px;margin:8px 0}
-.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.cal-pre{background:#ffffff0d;border-radius:10px;padding:10px;font-size:12px;line-height:1.5;overflow-x:auto;white-space:pre}
+:root{--bg:#12101c;--bar:#241d38;--card:#262138;--card2:#2e2846;--acc:#7c5cff;
+--txt:#f2efff;--mut:#9d94c0;--pill:#4a3a8c}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:var(--bg);color:var(--txt);padding-bottom:78px}
+header{background:linear-gradient(180deg,#8a70f0 0%,#6a4fe0 70%,#5f45d8 100%);
+padding:26px 16px 22px;text-align:center}
+#avatar{width:118px;height:118px;border-radius:50%;margin:0 auto 14px;
+background:#9d8bf0 center/cover no-repeat;border:3px solid #ffffff40}
+#hworld{font-size:19px;font-weight:700;margin-bottom:6px}
+#hhello{font-size:13px;opacity:.85;margin-bottom:12px}
+#chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#chips span{background:#3a2d7acc;border-radius:14px;padding:5px 12px;font-size:12px}
+#chips span.w{margin-top:8px;width:auto}
+#secbar{background:var(--bar);padding:12px 16px;font-weight:600;font-size:15px;
+display:flex;gap:8px;align-items:center}
+main{padding:12px;max-width:760px;margin:0 auto}
+section{display:none}section.on{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px}
+.grid .card{margin-bottom:0;cursor:pointer}
+.card .ico{font-size:26px;margin-bottom:8px}
+.card b{display:block;font-size:15px;margin-bottom:4px}
+.card .mut,.mut{color:var(--mut);font-size:12px}
+.row{display:flex;gap:10px;align-items:center;margin:6px 0}
+.btn{background:var(--acc);border:none;color:#fff;border-radius:10px;
+padding:9px 12px;margin:2px;font-size:13px;cursor:pointer}
+.btn.sec{background:var(--card2);border:1px solid #3a3355}
+input,select,textarea{width:100%;background:#191430;border:1px solid #352a55;
+border-radius:10px;color:var(--txt);padding:9px;margin:4px 0;font-size:13px}
+.sub{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+img.thumb{width:56px;height:56px;object-fit:cover;border-radius:10px;background:#332a55;flex:0 0 auto}
+img.big{width:100%;border-radius:12px;margin:6px 0;background:#332a55}
+.bar{height:8px;border-radius:4px;background:#332a55;overflow:hidden;margin:3px 0}
+.bar i{display:block;height:100%;background:#4caf50}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;gap:2px;overflow-x:auto;
+background:#17131fee;border-top:1px solid #2c2545;backdrop-filter:blur(6px);z-index:9}
+nav button{flex:0 0 auto;min-width:52px;padding:8px 4px;background:none;border:none;
+color:var(--mut);font-size:10px;cursor:pointer}
+nav button .e{display:block;font-size:17px;margin-bottom:2px}
+nav button.on{color:#fff;background:var(--acc);border-radius:12px}
+#arblog{max-height:46vh;overflow-y:auto}
 </style>
 </head>
 <body>
 <header>
-  <div class="bg" id="scen_bg"></div>
-  <div class="inner">
-    <div class="avatar"><img id="hero_img" src="avatar.jpg" alt="" onerror="this.src='avatar.jpg'"></div>
-    <h1 id="scen_name">LitRPG</h1>
-    <div class="sub" id="hello"></div>
-    <div class="chips" id="chips"></div>
-  </div>
+<div id="avatar"></div>
+<div id="hworld"></div>
+<div id="hhello"></div>
+<div id="chips"></div>
 </header>
-<div class="herobar">👤 <b id="hero_name"></b> <span class="muted" id="hero_pos"></span></div>
-<section id="content"></section>
+<div id="secbar"></div>
+<main>
+<section id="tab-home" class="on"></section>
+<section id="tab-hero"></section>
+<section id="tab-items"></section>
+<section id="tab-quests"></section>
+<section id="tab-map"></section>
+<section id="tab-party"></section>
+<section id="tab-time"></section>
+<section id="tab-relations"></section>
+<section id="tab-ency"></section>
+<section id="tab-arb"></section>
+<section id="tab-worlds"></section>
+</main>
 <nav id="nav"></nav>
 <script>
-const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
-const INIT = tg.initData;
-const NGROK = 'https://unexpired-pogo-splotchy.ngrok-free.dev';
-const API_BASE = location.hostname.endsWith('github.io') ? NGROK : '';
-let STATE=null, tab='home', enc_sub='scenario', enc_sel=null, editCtx=null;
-let itemSel=null, worldSel=null, locSel=null, heroEdit=false, IMG_V=1, ARB_LOG=[];
-let TIME_STATE=null;
-
-const STAT_RU = {strength:'Сила', magic_power:'Магическая сила', intelligence:'Интеллект',
- health:'Здоровье', max_health:'Макс. здоровье', speed:'Скорость', armor:'Броня', magic:'Магия',
- luck:'Удача', charisma:'Харизма', crit_chance_phys:'Крит физ. шанс', crit_multiplier_phys:'Крит физ. множитель',
- crit_chance_mag:'Крит маг. шанс', crit_multiplier_mag:'Крит маг. множитель',
- resist_fire:'Сопротивление огню', resist_water:'Сопротивление воде', resist_earth:'Сопротивление земле',
- resist_air:'Сопротивление воздуху', resist_light:'Сопротивление свету', resist_dark:'Сопротивление тьме'};
-const SLOT_RU = {hand:'Оружие (рука)', head:'Голова', body:'Тело', legs:'Ноги', feet:'Ступни',
- accessory:'Аксессуар', consumable:'Расходник', quest:'Квестовый'};
-const GENDER_RU = {male:'Мужчина', female:'Женщина'};
-const ru = k => STAT_RU[k] || SLOT_RU[k] || (k ? k[0].toUpperCase()+k.slice(1) : k);
-const QUAL_RU = {1:'Ржавый',2:'Обычный',3:'Качественный',4:'Редкий',5:'Эпический',6:'Легендарный'};
-const STATUS_RU = {not_done:'Не начато', in_progress:'В процессе', completed:'Завершено'};
-
-const NAV=[{id:'home',ic:'🏠',t:'Домой'},{id:'hero',ic:'👤',t:'Герой'},{id:'inv',ic:'🎒',t:'Вещи'},
- {id:'map',ic:'🗺️',t:'Карта'},{id:'time',ic:'⏰',t:'Время'},{id:'relations',ic:'💞',t:'Отношения'},
- {id:'ency',ic:'📚',t:'Энцикл.'},{id:'arbiter',ic:'⚖️',t:'Арбитр'},{id:'worlds',ic:'🌍',t:'Миры'}];
-const MENU=[{id:'hero',ic:'👤',t:'Персонаж',d:'Имя, пол, статы, внешность'},
- {id:'inv',ic:'🎒',t:'Инвентарь',d:'Карточки вещей с миниатюрами'},
- {id:'quests',ic:'📜',t:'Квесты',d:'Активные квесты'},{id:'map',ic:'🗺️',t:'Карта',d:'Локации и перемещение'},
- {id:'ency',ic:'📚',t:'Энциклопедия',d:'Мир, NPC, предметы, умения, расы'},
- {id:'arbiter',ic:'⚖️',t:'Арбитр',d:'Вопрос-ответ: правки мира'},
- {id:'worlds',ic:'🌍',t:'Миры',d:'Выбор мира, сброс'}];
-const TACTICS={balanced:'⚖ Сбалансированная',aggressive:'🗡 Агрессивная',defensive:'🛡 Защитная',support:'💠 Поддержка'};
-const ENC_TABS=[{id:'scenario',ic:'🌍',t:'Мир'},{id:'location',ic:'🗺️',t:'Локации'},{id:'npc',ic:'👥',t:'NPC'},
- {id:'item',ic:'🎒',t:'Предметы'},{id:'cskill',ic:'⚔️',t:'Боевые ум.'},{id:'nskill',ic:'✨',t:'Мирные ум.'},
- {id:'effect',ic:'🧪',t:'Эффекты'},{id:'race',ic:'🧬',t:'Расы'},{id:'faction',ic:'🏰',t:'Фракции'}];
-const SCHEMA={
- scenario:[['name','Название','text'],['genre','Жанр','text'],['description','Описание мира','area'],
-  ['greeting','Приветствие','area'],['image_prompt','Промт вида (EN)','area','img']],
- location:[['name','Название','text'],['description','Описание','area'],['image_prompt','Промт вида (EN)','area','img'],
-  ['is_safe','Безопасная (точка возрождения)','check'],['effects_json','Характеристики локации','statsgrid']],
- npc:[['name','Имя','text'],['gender','Пол (male/female)','text'],['race','Раса','text'],['npc_type','Тип (base/named)','text'],
-  ['position','Должность','text'],['role_description','Роль в мире','area'],['image_prompt','Промт вида (EN)','area','img'],
-  ['mood','Настроение 0–100','num'],['affection','Привязанность 0–100','num'],
-  ['intimacy','Раскрепощённость 0–100','num'],['reputation','Репутация 0–100','num'],
-  ['is_merchant','Торговец','check'],['is_immortal','Бессмертный','check'],['ability_craft','Ремесло (крафт)','text'],
-  ['base_stats','Базовые характеристики','statsgrid'],['effective_stats','Эффективные характеристики','statsgrid']],
- item:[['name','Название','text'],['quality','Качество 1–6','num'],['slot','Слот','text'],
-  ['rarity','Редкость (common/rare/epic)','text'],['price','Цена','num'],['revealing_level','Открытость 0–5','num'],
-  ['action','Действие (equip/use)','text'],['description','Описание','area'],['image_prompt','Промт вида (EN)','area','img'],
-  ['base_stat_modifiers','Параметры предмета','statsgrid']],
- cskill:[['name','Название','text'],['description','Описание','area'],['damage_type','Тип (physical/magical)','text'],
-  ['base_damage','Урон','num'],['cooldown','Кулдаун (ходов)','num'],['speed_bonus','Бонус скорости','num'],
-  ['stat_modifiers','Влияние на характеристики','statsgrid']],
- nskill:[['name','Название','text'],['description','Описание','area'],['stat_modifiers','Влияние на характеристики','statsgrid'],
-  ['duration_days','Длительность (сутки)','num']],
- effect:[['name','Название','text'],['description','Описание','area'],['stat_modifiers','Влияние на характеристики','statsgrid'],
-  ['power_grade','Сила −5…+5','num'],['duration_type','Тип (battle/days)','text'],['duration_value','Значение','num']],
- race:[['name','Название','text'],['description','Описание','area'],['base_stats','Базовые характеристики','statsgrid'],
-  ['max_level','Макс. уровень','num']],
- faction:[['name','Название','text'],['description','Описание','area'],['reputation','Репутация 0–100','num']],
- hero:[['name','Имя героя (как к нему обращаются NPC)','text'],['gender','Пол (male/female)','text'],
-  ['position','Должность','text'],['role_description','Роль в мире','area'],
-  ['image_prompt','Промт внешности (EN)','area','img'],
-  ['base_stats','Базовые характеристики','statsgrid'],['effective_stats','Эффективные характеристики','statsgrid']]};
-const GEN_MAP={scenario:'scenario',location:'location',npc:'npc',item:'item'};
-const UPLOADABLE=['hero','npc','item','location','scenario'];
-
-async function api(path,body={}){try{const r=await fetch(API_BASE+path,{method:'POST',
- headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'true'},
- body:JSON.stringify({init_data:INIT,...body})});return await r.json();}catch(e){return{ok:false,error:'network'};}}
-async function refresh(){STATE=await api('/api/menu/state');await render();}
-window.setTab=async id=>{tab=id;enc_sel=null;editCtx=null;itemSel=null;worldSel=null;locSel=null;heroEdit=false;await render();};
-window.setEncSub=async id=>{enc_sub=id;enc_sel=null;editCtx=null;await render();};
-window.openEnc=async id=>{enc_sel={entity:enc_sub,id};editCtx=enc_sel;await render();};
-window.encBack=async()=>{enc_sel=null;editCtx=null;await render();};
-window.openItem=async id=>{itemSel=STATE.inventory.find(i=>i.inv===id)||null;await render();};
-window.closeItem=async()=>{itemSel=null;await render();};
-window.openWorld=async id=>{worldSel=STATE.scenarios.find(w=>w.id===id)||null;await render();};
-window.closeWorld=async()=>{worldSel=null;await render();};
-window.openLoc=async id=>{locSel=STATE.locations.find(l=>l.id===id)||null;await render();};
-window.closeLoc=async()=>{locSel=null;await render();};
-window.heroEditToggle=async()=>{heroEdit=!heroEdit;
- editCtx=heroEdit?{entity:'hero',id:STATE.hero.id}:null;await render();};
-window.act=async(a,p={})=>{await api('/api/menu/action',{action:a,params:p});itemSel=null;locSel=null;await refresh();};
-window.genImg=async(type,id)=>{const r=await api('/api/gen_entity_image',{entity_type:type,id});
- if(r.ok){IMG_V=Date.now();await refresh();}else{tg.showAlert('🎨 '+(r.error||'ошибка генерации'));}};
-window.resetWorld=async(id)=>{
- let ok=false;
- try{ok=await new Promise(res=>tg.showConfirm({title:'Сбросить мир?',
-  message:'Удалятся: квесты, события, именные NPC, локации (кроме стартовой), предметы (кроме бутылей), инвентарь. Герой вернётся к 1 ур.'},r=>res(r)));}
- catch(e){ok=confirm('Сбросить мир?');}
- if(!ok)return;
- const r=await api('/api/reset_world',{scenario_id:id});
- tg.showAlert(r.ok?'♻️ Мир сброшен.':'❌ '+(r.error||'ошибка'));
- await refresh();};
-window.arbSend=async()=>{const el=document.getElementById('arb_in');const t=el.value.trim();if(!t)return;
- el.value='';ARB_LOG.push({q:t,a:'⏳ Арбитр думает...'});await render();
- const r=await api('/api/arbiter',{text:t});
- ARB_LOG[ARB_LOG.length-1].a=r.ok?(r.reply||'Готово.'):'❌ '+(r.error||'ошибка');
- await render();};
-
-/* === ТЗ §15 R-04: перемотка времени === */
-window.advanceTime=async(mins)=>{
- const r=await api('/api/advance_time',{minutes:mins});
- if(r.ok){TIME_STATE=r;await render();}
- else tg.showAlert('❌ '+(r.error||'ошибка'));};
-window.rewindTime=async(target)=>{
- const r=await api('/api/menu/time/rewind',{target});
- if(r.ok){TIME_STATE=r;await render();}
- else tg.showAlert('❌ '+(r.error||'ошибка'));};
-window.rewindExact=async()=>{
- const el=document.getElementById('time_exact');if(!el)return;
- const parts=el.value.split(':');if(parts.length!==2)return;
- const r=await api('/api/menu/time/rewind',{hour:parseInt(parts[0]),minute:parseInt(parts[1])});
- if(r.ok){TIME_STATE=r;await render();}
- else tg.showAlert('❌ '+(r.error||'ошибка'));};
-
-const card=(t,b)=>`<div class="card"><h3>${t}</h3>${b}</div>`;
-const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const thumbOf=s=>s&&s.includes('/media/images/')?s.replace('/media/images/','/media/images/thumbs/'):s;
-const imgTag=(src,w)=>src?`<img src="${API_BASE||''}${thumbOf(src)}?v=${IMG_V}" onerror="this.onerror=null;this.src=this.src.replace('/thumbs/','')" style="width:${w||52}px;height:${w||52}px;border-radius:10px;object-fit:cover;background:#ffffff14">`:`<div style="width:${w||52}px;height:${w||52}px;border-radius:10px;background:#ffffff14"></div>`;
-const modsRows=m=>Object.entries(m||{}).map(([k,v])=>`<div class="row"><span>${ru(k)}</span><b>${v}</b></div>`).join('')||'<div class="muted">Нет параметров</div>';
-function statsGrid(key,jsonStr){
- let obj={};try{obj=JSON.parse(jsonStr||'{}');}catch(e){}
- return `<div class="muted" style="margin-top:6px">${ru(key)}</div><div class="statgrid">`+
-  Object.entries(obj).map(([k,v])=>`<div><label>${ru(k)}</label><input class="in sg" data-sg="${key}" data-k="${k}" type="number" step="any" value="${esc(v)}" style="width:100%"></div>`).join('')+`</div>`;
+const API = location.hostname.endsWith('github.io')
+  ? 'https://unexpired-pogo-splotchy.ngrok-free.dev' : '';
+const TG = window.Telegram ? window.Telegram.WebApp : null;
+let S = null, EDIT = null, encyCur = 'npc_named';
+const NAV = [['home','🏠','Домой'],['hero','👤','Герой'],['items','🎒','Вещи'],
+['map','🗺️','Карта'],['time','⏰','Время'],['relations','💞','Отношения'],
+['ency','📚','Энцикл.'],['arb','⚖️','Арбитр'],['worlds','🌍','Миры']];
+const HOME_CARDS = [['hero','👤','Персонаж','Имя, пол, статы, внешность'],
+['items','🎒','Инвентарь','Карточки вещей с миниатюрами'],
+['quests','📜','Квесты','Активные квесты'],
+['map','🗺️','Карта','Локации и перемещение'],
+['party','👥','Группа','NPC в группе героя'],
+['time','⏰','Время','Перемотка и календарь'],
+['ency','📚','Энциклопедия','Мир, NPC, предметы, умения, расы'],
+['arb','⚖️','Арбитр','Вопрос-ответ: правки мира'],
+['worlds','🌍','Миры','Выбор мира, сброс']];
+const ENCY = [['scenario','Мир'],['location','Локации'],
+['npc_base','НПС Базовые'],['npc_named','НПС с Именем'],
+['item','Предметы'],['cskill','Боевые ум.'],['nskill','Мирные ум.'],
+['effect','Эффекты'],['race','Расы'],['faction','Фракции']];
+const STAT_RU = {strength:'Сила',magic_power:'Маг. сила',intelligence:'Интеллект',
+health:'Здоровье',max_health:'Макс. здоровье',speed:'Скорость',armor:'Броня',
+luck:'Удача',charisma:'Харизма',crit_chance_phys:'Крит физ %',
+crit_multiplier_phys:'Крит физ ×',crit_chance_mag:'Крит маг %',
+crit_multiplier_mag:'Крит маг ×',perception:'Восприятие'};
+const SLOT_RU = {hand:'Оружие',head:'Голова',body:'Тело',legs:'Ноги',feet:'Ступни',
+accessory:'Аксессуар',consumable:'Расходник',quest:'Квестовый'};
+const BOOL_FIELDS = new Set(['is_in_party','is_safe','is_immortal','is_merchant',
+'stackable','is_pregnant','fertility_enabled','events_active']);
+const $ = id => document.getElementById(id);
+const esc = s => (s==null?'':String(s)).replace(/[<>&]/g,
+  c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+async function api(p, b){
+  const r = await fetch(API + p, {method:'POST',
+    headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
+    body: JSON.stringify(Object.assign({init_data: TG ? TG.initData : ''}, b || {}))});
+  return r.json();
 }
-window.trPrompt=async key=>{const el=document.getElementById('ef_'+key);if(!el)return;
- const r=await api('/api/translate',{text:el.value});if(r.ok){el.value=r.en;tg.showAlert('🇬🇧 Переведено на английский');}};
-window.uploadEntity=async(inp,entity,id)=>{const f=inp.files[0];if(!f)return;
- const fd=new FormData();fd.append('file',f);
- try{const resp=await fetch(`${API_BASE}/api/upload_entity_image?entity=${entity}&id=${id}`,
-   {method:'POST',headers:{'ngrok-skip-browser-warning':'true'},body:fd});
-  const res=await resp.json();
-  if(res.ok){IMG_V=Date.now();await render();}else{tg.showAlert(res.error||'Ошибка загрузки');}
- }catch(e){tg.showAlert('Нет связи с сервером');}};
-window.encSave=async()=>{
- const ec=editCtx||enc_sel; if(!ec){tg.showAlert('Не выбран объект редактирования');return;}
- const schema=SCHEMA[ec.entity]||[];const fields={};
- for(const[key,,type]of schema){
-  if(type==='statsgrid'){
-   const obj={};document.querySelectorAll(`input[data-sg="${key}"]`).forEach(i=>{obj[i.dataset.k]=Number(i.value||0);});
-   fields[key]=JSON.stringify(obj);continue;}
-  const el=document.getElementById('ef_'+key);if(!el)continue;
-  fields[key]=(type==='check')?(el.checked?1:0):el.value;}
- const r=await api('/api/ency/update',{entity:ec.entity,id:ec.id,fields});
- tg.showAlert(r.ok?'💾 Сохранено':'❌ '+(r.error||'ошибка'));await refresh();};
-window.encGen=async()=>{
- const ec=editCtx||enc_sel; if(!ec)return;
- if(ec.entity==='hero'){const r=await api('/api/gen_hero_image',{});
-  if(r.ok){IMG_V=Date.now();await refresh();}else{tg.showAlert('🎨 '+(r.error||'ошибка'));}return;}
- const g=GEN_MAP[ec.entity];if(!g)return;
- const r=await api('/api/gen_entity_image',{entity_type:g,id:ec.id});
- if(r.ok){IMG_V=Date.now();await refresh();}else{tg.showAlert('🎨 '+(r.error||'ошибка'));}};
-
-async function editorHtml(entity,id){
- const g=await api('/api/ency/get',{entity,id});
- if(!g.ok)return card('❌','Запись не найдена');
- const rec=g.rec,schema=SCHEMA[entity]||[];
- let html=`<button class="btn ghost" onclick="${entity==='hero'?'heroEditToggle()':'encBack()'}">← Назад</button> <b style="margin-left:8px">${esc(rec.name||('#'+id))}</b>`;
- if(rec.image_media_id)html+=imgTag(rec.image_media_id,72);
- for(const[key,label,type,flag]of schema){
-  const v=rec[key];
-  if(type==='area'){html+=`<div class="muted">${label}</div><textarea id="ef_${key}" class="ta">${esc(v)}</textarea>`;
-   if(flag==='img')html+=`<button class="btn ghost" onclick="trPrompt('${key}')">🇬🇧 В английский</button>`;}
-  else if(type==='num'){html+=`<div class="row"><span>${label}</span><input id="ef_${key}" class="in" type="number" value="${esc(v)}"></div>`;}
-  else if(type==='check'){html+=`<div class="row"><span>${label}</span><input id="ef_${key}" type="checkbox" ${v?'checked':''}></div>`;}
-  else if(type==='statsgrid'){html+=statsGrid(key,typeof v==='string'?v:JSON.stringify(v||{}));}
-  else{html+=`<div class="row"><span>${label}</span><input id="ef_${key}" class="in" style="width:150px" value="${esc(v)}"></div>`;}}
- html+=`<button class="btn" onclick="encSave()">💾 Сохранить</button>`;
- if(GEN_MAP[entity]||entity==='hero')html+=`<button class="btn ghost" onclick="encGen()">🎨 Картинка</button>`;
- if(UPLOADABLE.includes(entity))html+=`<label class="btn ghost" style="display:inline-block">📤 Загрузить<input type="file" accept="image/*" style="display:none" onchange="uploadEntity(this,'${entity}',${id})"></label>`;
- return html;
+async function blobInto(img, path){
+  if(!path){ img.style.visibility='hidden'; return; }
+  try{
+    const r = await fetch(API + path + '?v=' + Date.now(),
+      {headers:{'ngrok-skip-browser-warning':'1'}});
+    img.src = URL.createObjectURL(await r.blob());
+    img.style.visibility='visible';
+  }catch(e){ img.style.visibility='hidden'; }
 }
-
-async function renderEnc(){
- let html=`<div class="tabs">`+ENC_TABS.map(t=>
-  `<button class="${enc_sub===t.id&&!enc_sel&&!locSel?'active':''}" onclick="setEncSub('${t.id}')">${t.ic} ${t.t}</button>`).join('')+`</div>`;
- if(locSel){const l=locSel;
-  html+=card(`🗺️ ${l.name}`,`${l.image?`<img src="${API_BASE||''}${thumbOf(l.image)}?v=${IMG_V}" onerror="this.onerror=null;this.src=this.src.replace('/thumbs/','')" style="width:100%;height:140px;object-fit:cover;border-radius:12px">`:'<div class="muted">Нет изображения</div>'}
-   <div class="muted" style="margin:8px 0">${esc(l.desc||'')}</div>
-   <h3 style="margin:6px 0 4px">Характеристики (влияют на всех внутри)</h3>${modsRows(l.effects)}
-   <div style="margin-top:10px">
-   ${l.current?'<div class="muted">📍 Вы здесь</div>':`<button class="btn" onclick="act('travel',{loc:${l.id}})">🚶 Переместиться туда</button>`}
-   <button class="btn ghost" onclick="openEnc(${l.id})">✏️ Редактировать</button>
-   <button class="btn ghost" onclick="closeLoc()">↩ Назад</button></div>`);
-  return html;}
- if(enc_sel){return html+await editorHtml(enc_sel.entity,enc_sel.id);}
- const l=await api('/api/ency/list',{entity:enc_sub});const rows=l.rows||[];
- if(enc_sub==='location'&&rows.length){
-  html+=rows.map(r=>`<div class="enc" onclick="openLoc(${r.id})">${imgTag(r.img,52)}<div class="t"><b>${esc(r.name)}</b></div><span class="muted">➡️</span></div>`).join('');
- }else if(enc_sub==='scenario'&&rows.length){
-  html+=`<div class="enc" onclick="openEnc(${rows[0].id})"><div class="t"><b>🌍 ${esc(rows[0].name)}</b><div class="muted">Открыть информацию о мире</div></div></div>`;
- }else if(rows.length){
-  html+=rows.map(r=>`<div class="enc" onclick="openEnc(${r.id})">${imgTag(r.img,52)}<div class="t"><b>${esc(r.name)}</b></div><span class="muted">✏️</span></div>`).join('');
- }else html+=card('📚','Раздел пуст.');
- return html;}
-
-/* === ТЗ §15 R-04: рендер вкладки «⏰ Время» === */
-async function renderTime(){
- if(!TIME_STATE){TIME_STATE=await api('/api/time',{});}
- const t=TIME_STATE;
- if(!t||!t.ok)return card('⏰ Время','<div class="muted">Нет связи или нет сценария</div>');
- let html=card('⏰ Текущее время',`
-  <div class="time-clock">${t.time||'--:--'}</div>
-  <div style="text-align:center;font-size:15px">${t.day_of_week||''}, ${t.date||''}</div>
-  <div class="row"><span>🍂 Сезон</span><b>${t.season||'—'}</b></div>
-  <div class="row"><span>🌤 Погода</span><b>${t.weather||'—'}</b></div>
-  <div class="row"><span>🌡 Температура</span><b>${t.temperature!=null?t.temperature+'°C':'—'}</b></div>
-  ${t.holiday?`<div class="row"><span>🎉 Праздник</span><b>${t.holiday}</b></div>`:''}`);
- html+=card('⏩ Быстрые переходы',`
-  <div class="time-grid">
-   <button class="btn" onclick="rewindTime('today_evening')">🌆 Сегодня 18:00</button>
-   <button class="btn" onclick="rewindTime('today_night')">🌙 Сегодня 22:00</button>
-   <button class="btn" onclick="rewindTime('tomorrow_morning')">🌅 Завтра 08:00</button>
-   <button class="btn" onclick="rewindTime('tomorrow_evening')">🌇 Завтра 19:00</button>
-  </div>
-  <div class="time-grid" style="margin-top:8px">
-   <button class="btn ghost" onclick="advanceTime(60)">+1 час</button>
-   <button class="btn ghost" onclick="advanceTime(480)">+8 часов</button>
-   <button class="btn ghost" onclick="advanceTime(1440)">+1 день</button>
-   <button class="btn ghost" onclick="advanceTime(10080)">+1 неделя</button>
-  </div>
-  <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
-   <input id="time_exact" class="in" type="time" value="12:00" style="width:130px">
-   <button class="btn" onclick="rewindExact()">⏱ Перейти</button>
-  </div>`);
- if(t.calendar){html+=card('📅 Календарь',`<div class="cal-pre">${esc(t.calendar)}</div>`);}
- return html;
+function thumb(path){ const i=document.createElement('img'); i.className='thumb';
+  blobInto(i,path); return i; }
+function bar(hp, mx){ const p = mx ? Math.max(0,Math.min(100,hp*100/mx)) : 0;
+  return `<div class="bar"><i style="width:${p}%"></i></div>
+  <span class="mut">${hp}/${mx}</span>`; }
+function show(tab){
+  document.querySelectorAll('main section').forEach(s =>
+    s.classList.toggle('on', s.id === 'tab-' + tab));
+  document.querySelectorAll('nav button').forEach(b =>
+    b.classList.toggle('on', b.dataset.t === tab));
+  const h = S ? S.hero : null;
+  const bars = {home:`👤 ${h?h.name:''} · ${h&&h.gender==='female'?'Женщина':'Мужчина'}`,
+    hero:'👤 Персонаж',items:'🎒 Инвентарь',quests:'📜 Квесты',map:'🗺️ Карта',
+    party:'👥 Группа',time:'⏰ Время',relations:'💞 Отношения',
+    ency:'📚 Энциклопедия',arb:'⚖️ Арбитр',worlds:'🌍 Миры'};
+  $('secbar').textContent = bars[tab] || '';
+  if(tab==='time') loadTime();
+  if(tab==='relations') loadRelations();
+  if(tab==='ency') loadEncy();
 }
-
-async function render(){
- document.getElementById('nav').innerHTML=NAV.map(t=>
-  `<button class="${t.id===tab?'active':''}" onclick="setTab('${t.id}')"><span class="ic">${t.ic}</span>${t.t}</button>`).join('');
- const el=id=>document.getElementById(id);
- const ok=STATE&&STATE.ok;
- if(ok){const h=STATE.hero,sc=STATE.scenario;
-  el('scen_name').textContent=sc.name||'LitRPG';
-  el('hello').textContent=`Привет, ${(tg.initDataUnsafe.user&&tg.initDataUnsafe.user.first_name)||'Женя'}!`;
-  el('hero_name').textContent=(h.name||'Герой')+' · '+(GENDER_RU[h.gender]||'Мужчина');
-  el('hero_pos').textContent=h.position||'';
-  if(sc.image)el('scen_bg').style.backgroundImage=`url(${API_BASE||''}${sc.image}?v=${IMG_V})`;
-  if(h.image)el('hero_img').src=(API_BASE||'')+thumbOf(h.image)+'?v='+IMG_V;
-  el('chips').innerHTML=`<span class="chip">⭐ Ур. ${h.level}</span><span class="chip">🪙 ${h.gold}</span><span class="chip">❤️ ${h.hp}/${h.max_hp}</span><span class="chip">🌍 ${sc.name}</span>`;
- }else{el('hero_name').textContent='';el('chips').innerHTML='<span class="chip">📡 Нет связи с игрой — бот и ngrok запущены?</span>';}
- let html='';
- if(tab==='home'){html='<div class="grid">'+MENU.map(m=>`<div class="item" onclick="setTab('${m.id}')"><div style="font-size:26px">${m.ic}</div><b>${m.t}</b><div class="muted">${m.d}</div></div>`).join('')+'</div>';}
- else if(!ok){html=card('⚠️ Меню недоступно','<div class="muted">Проверьте: бот запущен, ngrok поднят.</div>');}
- else{const h=STATE.hero;
-  if(tab==='hero'){
-   if(heroEdit){html+=await editorHtml('hero',h.id);}
-   else{
-    html+=card('❤️ Здоровье',`${imgTag(h.image,64)}<div class="bar"><i style="width:${Math.round(h.hp/h.max_hp*100)}%"></i></div><div class="muted">${h.hp} / ${h.max_hp} · Репутация ${h.rep} · ${GENDER_RU[h.gender]||'Мужчина'}</div>`);
-    html+=card('📊 Характеристики',Object.entries(h.stats).map(([k,v])=>`<div class="row"><span>${ru(k)}</span><b>${v}</b></div>`).join(''));
-    html+=card('🛡 Экипировка (ячейки)',h.equipped.length?h.equipped.map(e=>`<div class="row"><span style="display:flex;gap:8px;align-items:center">${imgTag(e.img,36)} ${ru(e.slot)}: ${e.name}</span><button class="btn ghost" onclick="act('unequip',{slot:'${e.slot}'})">Снять</button></div>`).join(''):'<div class="muted">Пусто — откройте сумку 🎒</div>');
-    html+=card('🎭 Внешность героя',`${imgTag(h.image,96)}
-     <div class="muted">Промт внешности (EN)</div><textarea id="hero_prompt" class="ta">${esc(h.image_prompt||'')}</textarea>
-     <button class="btn ghost" onclick="trHeroPrompt()">🇬🇧 В английский</button>
-     <button class="btn" onclick="genHero()">🎨 Сгенерировать</button>
-     <label class="btn ghost" style="display:inline-block">📤 Загрузить<input type="file" accept="image/*" style="display:none" onchange="uploadEntity(this,'hero',${h.id})"></label>
-     <div style="margin-top:10px"><button class="btn ghost" onclick="heroEditToggle()">✏️ Имя, пол и роль</button></div>`);}
-  }
-  if(tab==='inv'){
-   html=STATE.inventory.length?'<div class="grid">'+STATE.inventory.map(i=>
-    `<div class="item" onclick="openItem(${i.inv})">${imgTag(i.img,40)}<div style="margin-top:6px"><b>${i.name}</b> <span class="muted">x${i.qty}</span></div><div class="muted">${ru(i.slot||'')} · ${QUAL_RU[i.quality]||''} ${i.equipped?'⚔️':''}</div></div>`).join('')+'</div>':card('🎒 Инвентарь','<div class="muted">Пусто</div>');
-   if(itemSel){const i=itemSel;
-    html+=card(`🎒 ${i.name}`,`${imgTag(i.img,96)}
-     <div class="row"><span>Качество</span><b>${QUAL_RU[i.quality]||i.quality}</b></div>
-     <div class="row"><span>Слот</span><b>${ru(i.slot||'—')}</b></div>
-     <div class="row"><span>Редкость</span><b>${esc(i.rarity||'common')}</b></div>
-     <div class="muted" style="margin:8px 0">${esc(i.desc||'Нет описания')}</div>
-     <h3 style="margin:8px 0 4px">Параметры</h3>${modsRows(i.mods)}
-     <div style="margin-top:10px">
-     ${i.slot==='consumable'?`<button class="btn" onclick="act('use_item',{inv:${i.inv}})">Использовать</button>`:''}
-     ${(i.slot&&i.slot!=='consumable'&&i.slot!=='quest')?(i.equipped?`<button class="btn ghost" onclick="act('unequip',{slot:'${i.slot}'})">Снять</button>`:`<button class="btn" onclick="act('equip',{inv:${i.inv}})">Надеть</button>`):''}
-     <button class="btn ghost" onclick="closeItem()">↩ Назад</button></div>`);}
-  }
-  if(tab==='quests'){html=STATE.quests.length?STATE.quests.map(q=>card('📜 '+q.name,`<div class="muted">${(q.desc||'').slice(0,160)}</div><button class="btn ghost" onclick="act('quest_decline',{quest:${q.id}})">Отказаться</button>`)).join(''):card('📜 Квесты','<div class="muted">Нет активных квестов</div>');}
-  if(tab==='map'){html=STATE.locations.map(l=>card(`${l.current?'📍 ':''}${l.safe?'🛡️ ':''}${l.name}`,`${imgTag(l.image,64)}<div class="muted">${(l.desc||'').slice(0,120)}</div><div class="muted">${Object.entries(l.effects||{}).map(([k,v])=>`${ru(k)} ${v}`).join(' · ')||'Без особенностей'}</div>`+(l.current?'<div class="muted">Вы здесь</div>':`<button class="btn" onclick="act('travel',{loc:${l.id}})">Переместиться</button>`))).join('')||card('🗺️ Карта','<div class="muted">Пусто</div>');}
-  if(tab==='time'){html=await renderTime();}
-  if(tab==='relations'){
-   const relsResp=await api('/api/relationships',{});
-   if(relsResp.ok&&relsResp.relationships&&relsResp.relationships.length>0){
-    html=relsResp.relationships.map(r=>card(`💞 ${r.name}`,`
-     <div class="row"><span>Тип</span><b>${r.type||'—'}</b></div>
-     <div class="row"><span>Теплота</span><b>${r.warmth}</b></div>
-     <div class="row"><span>Близость</span><b>${r.intimacy}</b></div>
-     <div class="row"><span>Страсть</span><b>${r.passion}</b></div>
-     <div class="row"><span>Обязательства</span><b>${r.commitment}</b></div>
-     <div class="row"><span>Конфликт</span><b>${r.conflict}</b></div>`)).join('');
-   }else html=card('💞 Отношения','<div class="muted">Пока нет отношений с NPC</div>');
-  }
-  if(tab==='arbiter'){
-   html=ARB_LOG.map(e=>`<div class="card"><div class="muted">Вы: ${esc(e.q)}</div><div style="margin-top:6px">${esc(e.a).replace(/\n/g,'<br>')}</div></div>`).join('');
-   html+=`<div class="card"><textarea id="arb_in" class="ta" placeholder="Спроси Арбитра: создать локацию, NPC, расу, фракцию, эффект, предмет; изменить или удалить запись..."></textarea>
-    <button class="btn" onclick="arbSend()">⚖️ Спросить Арбитра</button>
-    <div class="muted" style="margin-top:6px">Арбитр правит БД напрямую. Ведущий и NPC НЕ знают об этом разговоре.</div></div>`;
-  }
-  if(tab==='ency'){html=await renderEnc();}
-  if(tab==='worlds'){
-   if(worldSel){const w=worldSel;
-    html=card('🌍 '+w.name,`${w.image?`<img src="${API_BASE||''}${thumbOf(w.image)}?v=${IMG_V}" onerror="this.onerror=null;this.src=this.src.replace('/thumbs/','')" style="width:100%;height:140px;object-fit:cover;border-radius:12px">`:''}<div class="muted" style="margin:8px 0">${esc(w.desc||'')}</div>
-     <div>
-     ${w.active?'<div class="muted">✅ Активный мир</div>':`<button class="btn" onclick="act('switch',{scenario:${w.id}})">▶️ Сделать активным</button>`}
-     <button class="btn danger" onclick="resetWorld(${w.id})">♻️ Сбросить всё</button>
-     <button class="btn ghost" onclick="closeWorld()">↩ Назад в меню</button></div>`);}
-   else html=STATE.scenarios.map(w=>`<div class="wcard" onclick="openWorld(${w.id})"><img src="${(API_BASE||'')+thumbOf(w.image||'avatar.jpg')}?v=${IMG_V}" onerror="this.onerror=null;this.src=this.src.replace('/thumbs/','')" style="width:100%;height:120px;object-fit:cover;background:#ffffff14"><b>${w.active?'✅ ':''}${w.name} (${w.genre})</b></div>`).join('');}
- }
- el('content').innerHTML=html;}
-window.trHeroPrompt=async()=>{const el=document.getElementById('hero_prompt');if(!el)return;
- const r=await api('/api/translate',{text:el.value});if(r.ok){el.value=r.en;tg.showAlert('🇬🇧 Переведено');}};
-window.genHero=async()=>{const el=document.getElementById('hero_prompt');
- if(el){const sav=await api('/api/ency/update',{entity:'hero',id:STATE.hero.id,fields:{image_prompt:el.value}});
-  if(!sav.ok){tg.showAlert('Не удалось сохранить промт');}}
- const r=await api('/api/gen_hero_image',{});
- if(r.ok){IMG_V=Date.now();await refresh();}else{tg.showAlert('🎨 '+(r.error||'ошибка генерации'));}};
-refresh();
+function tabs(){
+  $('nav').innerHTML = NAV.map(t =>
+    `<button data-t="${t[0]}"><span class="e">${t[1]}</span>${t[2]}</button>`).join('');
+  $('nav').onclick = e => { const b = e.target.closest('button');
+    if(b) show(b.dataset.t); };
+}
+function header(){
+  const sc = S.scenario, h = S.hero;
+  blobInto($('avatar'), h.image);
+  $('hworld').textContent = `<${sc.name}>`;
+  $('hhello').textContent = sc.greeting || `Привет, ${h.name}!`;
+  $('chips').innerHTML =
+    `<span>⭐ Ур. ${h.level}</span><span>🪙 ${h.gold}</span>` +
+    `<span>❤️ ${h.hp}/${h.max_hp}</span>` +
+    `<span class="w">🌍 &lt;${sc.name}&gt;</span>`;
+}
+function renderHome(){
+  $('tab-home').innerHTML = `<div class="grid">` + HOME_CARDS.map(c =>
+    `<div class="card" data-go="${c[0]}"><div class="ico">${c[1]}</div>
+     <b>${c[2]}</b><span class="mut">${c[3]}</span></div>`).join('') + `</div>`;
+  $('tab-home').onclick = e => { const c = e.target.closest('[data-go]');
+    if(c) show(c.dataset.go); };
+}
+function renderHero(){
+  const h = S.hero;
+  const stats = Object.entries(h.stats||{}).map(([k,v]) =>
+    `<div>${STAT_RU[k]||k}: <b>${v}</b></div>`).join('');
+  $('tab-hero').innerHTML =
+   `<div class="card"><b>Профиль</b>
+    <div>Имя: <b>${esc(h.name)}</b> · Пол: <b>${h.gender==='female'?'Ж':'М'}</b></div>
+    <div class="mut">${esc(h.position||'')}</div>
+    <button class="btn sec" onclick="heroEdit()">✏️ Изменить</button></div>
+   <div class="card"><b>Характеристики</b>
+    <div class="grid" style="grid-template-columns:1fr 1fr">${stats}</div></div>
+   <div class="card"><b>Экипировка</b><div id="eqlist"></div></div>
+   <div class="card"><b>Внешность</b><div id="heroimg"></div>
+    <div class="mut" id="heroprompt">${esc(h.image_prompt||'')}</div>
+    <button class="btn" onclick="genHero()">🎨 Сгенерировать</button>
+    <label class="btn sec" style="display:inline-block">📤 Загрузить
+    <input type="file" hidden accept="image/*" onchange="upHero(this)"></label></div>`;
+  const eq = $('eqlist');
+  eq.innerHTML = (h.equipped||[]).length ? '' : '<div class="mut">Ничего не надето</div>';
+  (h.equipped||[]).forEach(e => { const row = document.createElement('div');
+    row.className = 'row'; row.appendChild(thumb(e.img));
+    row.insertAdjacentHTML('beforeend',
+      `<div><b>${SLOT_RU[e.slot]||e.slot}</b>: ${esc(e.name)}</div>`);
+    eq.appendChild(row); });
+  const bi = document.createElement('img'); bi.className='big';
+  blobInto(bi, h.image); $('heroimg').appendChild(bi);
+}
+async function heroEdit(){
+  const h = S.hero;
+  $('tab-hero').insertAdjacentHTML('afterbegin',
+   `<div class="card" id="editbox"><b>✏️ Редактор персонажа</b>
+    <label class="mut">Имя</label><input id="e_name" value="${esc(h.name)}">
+    <label class="mut">Пол</label><select id="e_gender">
+     <option value="male" ${h.gender==='male'?'selected':''}>Мужской</option>
+     <option value="female" ${h.gender==='female'?'selected':''}>Женский</option></select>
+    <label class="mut">Должность</label><input id="e_position" value="${esc(h.position||'')}">
+    <label class="mut">Статы (числа)</label>
+    ${Object.entries(h.stats||{}).map(([k,v]) =>
+      `<div class="row"><span class="mut" style="flex:1">${STAT_RU[k]||k}</span>
+       <input type="number" data-f="${k}" value="${v}" style="width:90px"></div>`).join('')}
+    <button class="btn" onclick="heroSave()">💾 Сохранить</button>
+    <button class="btn sec" onclick="$('editbox').remove()">↩ Отмена</button></div>`);
+}
+async function heroSave(){
+  const f = {name:$('e_name').value, gender:$('e_gender').value,
+    position:$('e_position').value};
+  document.querySelectorAll('#editbox [data-f]')
+    .forEach(i => f[i.dataset.f] = +i.value);
+  await api('/api/ency/update', {entity:'hero', id:S.hero.id, fields:f});
+  const eb = $('editbox'); if(eb) eb.remove();
+  load();
+}
+async function genHero(){ await api('/api/gen_hero_image', {}); load(); }
+async function upHero(inp){
+  const f = inp.files[0]; if(!f) return;
+  const fd = new FormData(); fd.append('file', f);
+  await fetch(API + `/api/upload_entity_image?entity=hero&id=${S.hero.id}`,
+    {method:'POST', body:fd, headers:{'ngrok-skip-browser-warning':'1'}});
+  load();
+}
+function renderItems(){
+  $('tab-items').innerHTML = (S.inventory||[]).map(i =>
+   `<div class="card"><div class="row" data-img="${i.inv}"></div>
+    <div class="mut">слот: ${SLOT_RU[i.slot]||i.slot} · качество ${i.quality} · ×${i.qty}</div>
+    <div class="mut">${esc(i.desc||'')}</div>
+    ${i.slot==='consumable'
+      ? `<button class="btn" onclick="act('use_item',{inv:${i.inv}})">Использовать</button>` : ''}
+    ${['consumable','quest'].includes(i.slot) ? ''
+      : (i.equipped
+        ? `<button class="btn sec" onclick="act('unequip',{slot:'${i.slot}'})">Снять</button>`
+        : `<button class="btn" onclick="act('equip',{inv:${i.inv}})">Надеть</button>`)}</div>`
+  ).join('') || '<div class="card mut">Инвентарь пуст</div>';
+  (S.inventory||[]).forEach(i => {
+    const row = document.querySelector(`#tab-items [data-img="${i.inv}"]`);
+    if(row){ row.appendChild(thumb(i.img));
+      row.insertAdjacentHTML('beforeend', `<div><b>${esc(i.name)}</b></div>`); } });
+}
+function renderQuests(){
+  $('tab-quests').innerHTML = (S.quests||[]).map(q =>
+   `<div class="card"><b>${esc(q.name)}</b>
+    <div class="mut">${esc(q.desc||'')}</div>
+    <button class="btn sec" onclick="act('quest_decline',{quest:${q.id}})">Отказаться</button></div>`
+  ).join('') || '<div class="card mut">Нет активных квестов</div>';
+}
+function renderMap(){
+  $('tab-map').innerHTML = (S.locations||[]).map(l =>
+   `<div class="card"><div class="row" data-img="${l.id}"></div>
+    <div class="mut">${esc((l.desc||'').slice(0,140))}</div>
+    ${l.current ? '<div class="mut">📍 Ты здесь</div>'
+      : `<button class="btn" onclick="act('travel',{loc:${l.id}})">🚶 Переместиться</button>`}
+    <button class="btn sec" onclick="openEncy('location',${l.id})">✏️ Редактировать</button></div>`
+  ).join('');
+  (S.locations||[]).forEach(l => {
+    const row = document.querySelector(`#tab-map [data-img="${l.id}"]`);
+    if(row){ row.appendChild(thumb(l.image));
+      row.insertAdjacentHTML('beforeend',
+        `<div><b>${esc(l.name)}</b> ${l.current?'📍':''}${l.safe?'🛡️':''}</div>`); } });
+}
+function renderParty(){
+  const p = S.party || [];
+  $('tab-party').innerHTML = `<div class="card"><b>👥 Группа (${p.length}/10)</b>
+   ${p.map(n => `<div class="row"><div style="flex:1">
+     <b>${esc(n.name)}</b> <span class="mut">ур.${n.level} · ${esc(n.race||'')}</span>
+     ${bar(n.hp, n.max_hp)}</div>
+     <button class="btn sec" onclick="kick(${n.id})">Исключить</button></div>`).join('')
+     || '<div class="mut">Группа пуста. Добавь в чате: «возьми X в группу» или /party add &lt;id&gt;</div>'}</div>`;
+}
+async function kick(id){
+  if(!confirm('Исключить из группы?')) return;
+  await api('/api/ency/update', {entity:'npc_named', id, fields:{is_in_party:0}});
+  await api('/api/ency/update', {entity:'npc_base', id, fields:{is_in_party:0}});
+  load();
+}
+async function loadTime(){
+  const t = await api('/api/time', {});
+  const mod = t.minute_of_day != null ? t.minute_of_day : 480;
+  const ev = Math.max(5, 1080 - mod), ni = Math.max(5, 1320 - mod),
+        mo = (1440 - mod) + 480;
+  $('tab-time').innerHTML = `<div class="card"><b>⏰ Время</b>
+   <div>${esc(t.date||t.game_date||'')} · <b>${esc(t.time||'')}</b></div>
+   <div class="mut">Сезон: ${esc(t.season||'')} · Погода: ${esc(t.weather||'')} ·
+    ${t.temperature_c!=null ? t.temperature_c+'°C' : ''}</div>
+   <button class="btn sec" onclick="adv(30)">+30 мин</button>
+   <button class="btn sec" onclick="adv(60)">+1 час</button>
+   <button class="btn sec" onclick="adv(180)">+3 часа</button>
+   <button class="btn" onclick="adv(${ev})">Сегодня вечер</button>
+   <button class="btn" onclick="adv(${ni})">Сегодня ночь</button>
+   <button class="btn" onclick="adv(${mo})">Завтра утро</button>
+   <label class="mut">Точная перемотка (минут)</label>
+   <input id="tmin" type="number" placeholder="Например 240">
+   <button class="btn" onclick="adv(+$('tmin').value||0)">⌨️ Перемотать</button>
+   <div class="mut">Календарь с праздниками — команда /calendar в чате</div></div>`;
+}
+async function adv(m){ if(!m) return; await api('/api/advance_time', {minutes:m});
+  alert('⏩ Время перемотано'); load(); loadTime(); }
+async function loadRelations(){
+  const r = await api('/api/relationships', {});
+  $('tab-relations').innerHTML = `<div class="card"><b>💞 Отношения</b>
+   ${(r.relationships||[]).map(x =>
+     `<div class="row"><div style="flex:1"><b>${esc(x.name)}</b>
+      <div class="mut">${esc(x.type||'')} · тепло ${x.warmth}</div>
+      <div class="mut">I${x.intimacy} P${x.passion} C${x.commitment} K${x.conflict}</div></div></div>`).join('')
+     || '<div class="mut">Пока ни с кем не знаком</div>'}</div>`;
+}
+async function loadEncy(sub){
+  if(sub) encyCur = sub;
+  $('tab-ency').innerHTML = `<div class="sub">${ENCY.map(e =>
+    `<button class="btn ${e[0]===encyCur?'':'sec'}"
+      onclick="loadEncy('${e[0]}')">${e[1]}</button>`).join('')}</div>
+   <div id="encylist"></div><div id="encycard"></div>`;
+  const r = await api('/api/ency/list', {entity: encyCur});
+  $('encylist').innerHTML = (r.rows||[]).map(x =>
+   `<div class="card"><div class="row" data-img="${x.id}"></div>
+    <button class="btn sec" onclick="openEncy('${encyCur}',${x.id})">✏️ Изменить</button></div>`
+  ).join('') || '<div class="card mut">Пусто</div>';
+  (r.rows||[]).forEach(x => {
+    const row = document.querySelector(`#encylist [data-img="${x.id}"]`);
+    if(row){ row.appendChild(thumb(x.img));
+      row.insertAdjacentHTML('beforeend', `<div><b>${esc(x.name)}</b></div>`); } });
+}
+async function openEncy(entity, id){
+  const r = await api('/api/ency/get', {entity, id});
+  if(!r.ok) return;
+  EDIT = {entity, id, rec: r.rec};
+  const skip = new Set(['image_media_id']);
+  const rows = Object.entries(r.rec).filter(([k,v]) => !skip.has(k) && v != null && v !== '')
+    .map(([k,v]) => `<div class="mut">${k}: <b style="color:var(--txt)">${esc(String(v).slice(0,120))}</b></div>`).join('');
+  $('encycard').innerHTML = `<div class="card"><b>✏️ ${esc(r.rec.name||('#'+id))}</b>
+   <div id="encimg"></div>${rows}
+   <button class="btn" onclick="encyEdit()">✏️ Изменить</button>
+   <button class="btn sec" onclick="encyGen()">🎨 Картинка</button>
+   <label class="btn sec" style="display:inline-block">📤 Загрузить
+   <input type="file" hidden accept="image/*" onchange="encyUp(this)"></label>
+   <button class="btn sec" onclick="$('encycard').innerHTML=''">↩ Закрыть</button></div>`;
+  const bi = document.createElement('img'); bi.className='big';
+  blobInto(bi, r.rec.image_media_id); $('encimg').appendChild(bi);
+}
+function encyEdit(){
+  const rec = EDIT.rec;
+  const skip = new Set(['npc_id','item_id','location_id','scenario_id','hero_id',
+    'race_id','faction_id','effect_id','combat_skill_id','noncombat_skill_id',
+    'image_media_id']);
+  $('encycard').insertAdjacentHTML('afterbegin',
+   `<div class="card" id="encedit"><b>Редактор полей</b>` +
+   Object.entries(rec).filter(([k]) => !skip.has(k)).map(([k,v]) => {
+     const val = v==null ? '' : (typeof v==='object' ? JSON.stringify(v) : String(v));
+     if(BOOL_FIELDS.has(k))
+       return `<label class="mut"><input type="checkbox" data-f="${k}"
+         ${+v===1?'checked':''} style="width:auto"> ${k}</label>`;
+     return `<label class="mut">${k}</label>` + (val.length > 60
+       ? `<textarea data-f="${k}" rows="2">${esc(val)}</textarea>`
+       : `<input data-f="${k}" value="${esc(val)}">`);
+   }).join('') +
+   `<button class="btn" onclick="encySave()">💾 Сохранить</button>
+    <button class="btn sec" onclick="$('encedit').remove()">↩ Отмена</button></div>`);
+}
+async function encySave(){
+  const f = {};
+  document.querySelectorAll('#encedit [data-f]').forEach(i =>
+    f[i.dataset.f] = i.type === 'checkbox' ? (i.checked ? 1 : 0) : i.value);
+  await api('/api/ency/update', {entity:EDIT.entity, id:EDIT.id, fields:f});
+  const eb = $('encedit'); if(eb) eb.remove();
+  loadEncy(); openEncy(EDIT.entity, EDIT.id);
+}
+async function encyGen(){
+  const t = {npc_base:'npc', npc_named:'npc', item:'item',
+    location:'location', scenario:'scenario'}[EDIT.entity];
+  if(!t) return;
+  await api('/api/gen_entity_image', {entity_type:t, id:EDIT.id});
+  openEncy(EDIT.entity, EDIT.id);
+}
+async function encyUp(inp){
+  const f = inp.files[0]; if(!f) return;
+  const fd = new FormData(); fd.append('file', f);
+  const t = {npc_base:'npc', npc_named:'npc'}[EDIT.entity] || EDIT.entity;
+  await fetch(API + `/api/upload_entity_image?entity=${t}&id=${EDIT.id}`,
+    {method:'POST', body:fd, headers:{'ngrok-skip-browser-warning':'1'}});
+  openEncy(EDIT.entity, EDIT.id);
+}
+function renderArb(){
+  if($('arblog')) return;
+  $('tab-arb').innerHTML = `<div class="card"><b>⚖️ Арбитр</b>
+   <div id="arblog"></div>
+   <div class="row"><input id="arbin" placeholder="Вопрос или правка мира...">
+   <button class="btn" onclick="sendArb()">➤</button></div></div>`;
+}
+async function sendArb(){
+  const txt = $('arbin').value; if(!txt) return;
+  $('arblog').insertAdjacentHTML('beforeend',
+    `<div class="card"><b>Ты:</b> ${esc(txt)}</div>`);
+  $('arbin').value = '';
+  const r = await api('/api/arbiter', {text: txt});
+  $('arblog').insertAdjacentHTML('beforeend',
+    `<div class="card"><b>Арбитр:</b> ${esc(r.reply||r.error||'')}</div>`);
+  $('arblog').scrollTop = 1e6;
+}
+function renderWorlds(){
+  $('tab-worlds').innerHTML = (S.scenarios||[]).map(w =>
+   `<div class="card"><div class="row" data-img="${w.id}"></div>
+    <div class="mut">${esc(w.genre||'')}</div>
+    ${w.active ? '<div class="mut">✅ Активен</div>'
+      : `<button class="btn" onclick="act('switch',{scenario:${w.id}})">Сделать активным</button>`}
+    <button class="btn sec" onclick="resetWorld(${w.id})">♻️ Сбросить всё</button></div>`
+  ).join('');
+  (S.scenarios||[]).forEach(w => {
+    const row = document.querySelector(`#tab-worlds [data-img="${w.id}"]`);
+    if(row){ row.appendChild(thumb(w.image));
+      row.insertAdjacentHTML('beforeend', `<div><b>${esc(w.name)}</b></div>`); } });
+}
+async function resetWorld(id){
+  if(!confirm('Сбросить мир? Прогресс героя и именные NPC будут удалены.')) return;
+  await fetch(API + '/api/reset_world', {method:'POST',
+    headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
+    body: JSON.stringify({init_data: TG ? TG.initData : '', scenario_id: id})});
+  alert('♻️ Мир сброшен'); load();
+}
+async function act(a, p){
+  const r = await api('/api/menu/action', {action:a, params:p});
+  if(r && r.error) alert('❌ ' + r.error);
+  load();
+}
+async function load(){
+  S = await api('/api/menu/state', {});
+  if(!S.ok) return;
+  header(); renderHome(); renderHero(); renderItems(); renderQuests();
+  renderMap(); renderParty(); renderWorlds(); renderArb();
+}
+tabs(); show('home'); load();
 </script>
 </body>
 </html>
