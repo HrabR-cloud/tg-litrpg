@@ -6,18 +6,18 @@
 <title>LitRPG Меню</title>
 <style>
 :root{--bg:#12101c;--bar:#241d38;--card:#262138;--card2:#2e2846;--acc:#7c5cff;
---txt:#f2efff;--mut:#9d94c0;--pill:#4a3a8c}
+--txt:#f2efff;--mut:#9d94c0}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
 body{background:var(--bg);color:var(--txt);padding-bottom:78px}
 header{background:linear-gradient(180deg,#8a70f0 0%,#6a4fe0 70%,#5f45d8 100%);
-padding:26px 16px 22px;text-align:center}
-#avatar{width:118px;height:118px;border-radius:50%;margin:0 auto 14px;
-background:#9d8bf0 center/cover no-repeat;border:3px solid #ffffff40}
-#hworld{font-size:19px;font-weight:700;margin-bottom:6px}
+padding:22px 16px 20px;text-align:center}
+#avatar{width:112px;height:112px;border-radius:50%;margin:0 auto 12px;
+background:#9d8bf0 center/cover no-repeat;border:3px solid #ffffff40;
+display:flex;align-items:center;justify-content:center;font-size:46px;overflow:hidden}
+#hworld{font-size:19px;font-weight:700;margin-bottom:4px}
 #hhello{font-size:13px;opacity:.85;margin-bottom:12px}
 #chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 #chips span{background:#3a2d7acc;border-radius:14px;padding:5px 12px;font-size:12px}
-#chips span.w{margin-top:8px;width:auto}
 #secbar{background:var(--bar);padding:12px 16px;font-weight:600;font-size:15px;
 display:flex;gap:8px;align-items:center}
 main{padding:12px;max-width:760px;margin:0 auto}
@@ -27,7 +27,7 @@ section{display:none}section.on{display:block}
 .grid .card{margin-bottom:0;cursor:pointer}
 .card .ico{font-size:26px;margin-bottom:8px}
 .card b{display:block;font-size:15px;margin-bottom:4px}
-.card .mut,.mut{color:var(--mut);font-size:12px}
+.mut{color:var(--mut);font-size:12px}
 .row{display:flex;gap:10px;align-items:center;margin:6px 0}
 .btn{background:var(--acc);border:none;color:#fff;border-radius:10px;
 padding:9px 12px;margin:2px;font-size:13px;cursor:pointer}
@@ -50,7 +50,7 @@ nav button.on{color:#fff;background:var(--acc);border-radius:12px}
 </head>
 <body>
 <header>
-<div id="avatar"></div>
+<div id="avatar">👤</div>
 <div id="hworld"></div>
 <div id="hhello"></div>
 <div id="chips"></div>
@@ -78,12 +78,14 @@ let S = null, EDIT = null, encyCur = 'npc_named';
 const NAV = [['home','🏠','Домой'],['hero','👤','Герой'],['items','🎒','Вещи'],
 ['map','🗺️','Карта'],['time','⏰','Время'],['relations','💞','Отношения'],
 ['ency','📚','Энцикл.'],['arb','⚖️','Арбитр'],['worlds','🌍','Миры']];
-const HOME_CARDS = [['hero','👤','Персонаж','Имя, пол, статы, внешность'],
+const HOME_CARDS = [
+['hero','👤','Персонаж','Имя, пол, статы, внешность'],
 ['items','🎒','Инвентарь','Карточки вещей с миниатюрами'],
 ['quests','📜','Квесты','Активные квесты'],
 ['map','🗺️','Карта','Локации и перемещение'],
 ['party','👥','Группа','NPC в группе героя'],
 ['time','⏰','Время','Перемотка и календарь'],
+['relations','💞','Отношения','Шкалы и типы связей'],
 ['ency','📚','Энциклопедия','Мир, NPC, предметы, умения, расы'],
 ['arb','⚖️','Арбитр','Вопрос-ответ: правки мира'],
 ['worlds','🌍','Миры','Выбор мира, сброс']];
@@ -91,15 +93,6 @@ const ENCY = [['scenario','Мир'],['location','Локации'],
 ['npc_base','НПС Базовые'],['npc_named','НПС с Именем'],
 ['item','Предметы'],['cskill','Боевые ум.'],['nskill','Мирные ум.'],
 ['effect','Эффекты'],['race','Расы'],['faction','Фракции']];
-const STAT_RU = {strength:'Сила',magic_power:'Маг. сила',intelligence:'Интеллект',
-health:'Здоровье',max_health:'Макс. здоровье',speed:'Скорость',armor:'Броня',
-luck:'Удача',charisma:'Харизма',crit_chance_phys:'Крит физ %',
-crit_multiplier_phys:'Крит физ ×',crit_chance_mag:'Крит маг %',
-crit_multiplier_mag:'Крит маг ×',perception:'Восприятие'};
-const SLOT_RU = {hand:'Оружие',head:'Голова',body:'Тело',legs:'Ноги',feet:'Ступни',
-accessory:'Аксессуар',consumable:'Расходник',quest:'Квестовый'};
-const BOOL_FIELDS = new Set(['is_in_party','is_safe','is_immortal','is_merchant',
-'stackable','is_pregnant','fertility_enabled','events_active']);
 const $ = id => document.getElementById(id);
 const esc = s => (s==null?'':String(s)).replace(/[<>&]/g,
   c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
@@ -110,19 +103,38 @@ async function api(p, b){
   return r.json();
 }
 async function blobInto(img, path){
-  if(!path){ img.style.visibility='hidden'; return; }
+  if(!path){ img.style.visibility='hidden'; return false; }
   try{
     const r = await fetch(API + path + '?v=' + Date.now(),
       {headers:{'ngrok-skip-browser-warning':'1'}});
     img.src = URL.createObjectURL(await r.blob());
-    img.style.visibility='visible';
-  }catch(e){ img.style.visibility='hidden'; }
+    img.style.visibility='visible'; return true;
+  }catch(e){ img.style.visibility='hidden'; return false; }
 }
-function thumb(path){ const i=document.createElement('img'); i.className='thumb';
-  blobInto(i,path); return i; }
-function bar(hp, mx){ const p = mx ? Math.max(0,Math.min(100,hp*100/mx)) : 0;
-  return `<div class="bar"><i style="width:${p}%"></i></div>
-  <span class="mut">${hp}/${mx}</span>`; }
+/* Шапка: круг = иконка героя (fallback 👤), текст = ТОЛЬКО название мира */
+async function header(){
+  const sc = S.scenario, h = S.hero;
+  const av = $('avatar');
+  av.innerHTML = '👤';
+  av.style.backgroundImage = 'none';
+  if(h.image){
+    const probe = new Image();
+    const ok = await new Promise(res => {
+      fetch(API + h.image + '?v=' + Date.now(),
+        {headers:{'ngrok-skip-browser-warning':'1'}})
+        .then(r => r.blob()).then(b => { probe.src = URL.createObjectURL(b);
+          probe.onload = () => res(true); probe.onerror = () => res(false); })
+        .catch(() => res(false));
+    });
+    if(ok){ av.innerHTML = ''; av.style.backgroundImage = `url(${probe.src})`; }
+  }
+  $('hworld').textContent = `<${sc.name}>`;
+  $('hhello').textContent = `Привет, ${h.name}!`;
+  $('chips').innerHTML =
+    `<span>⭐ Ур. ${h.level}</span><span>🪙 ${h.gold}</span>` +
+    `<span>❤️ ${h.hp}/${h.max_hp}</span>` +
+    `<span>🌍 &lt;${sc.name}&gt;</span>`;
+}
 function show(tab){
   document.querySelectorAll('main section').forEach(s =>
     s.classList.toggle('on', s.id === 'tab-' + tab));
@@ -144,16 +156,6 @@ function tabs(){
   $('nav').onclick = e => { const b = e.target.closest('button');
     if(b) show(b.dataset.t); };
 }
-function header(){
-  const sc = S.scenario, h = S.hero;
-  blobInto($('avatar'), h.image);
-  $('hworld').textContent = `<${sc.name}>`;
-  $('hhello').textContent = sc.greeting || `Привет, ${h.name}!`;
-  $('chips').innerHTML =
-    `<span>⭐ Ур. ${h.level}</span><span>🪙 ${h.gold}</span>` +
-    `<span>❤️ ${h.hp}/${h.max_hp}</span>` +
-    `<span class="w">🌍 &lt;${sc.name}&gt;</span>`;
-}
 function renderHome(){
   $('tab-home').innerHTML = `<div class="grid">` + HOME_CARDS.map(c =>
     `<div class="card" data-go="${c[0]}"><div class="ico">${c[1]}</div>
@@ -164,7 +166,7 @@ function renderHome(){
 function renderHero(){
   const h = S.hero;
   const stats = Object.entries(h.stats||{}).map(([k,v]) =>
-    `<div>${STAT_RU[k]||k}: <b>${v}</b></div>`).join('');
+    `<div>${k}: <b>${v}</b></div>`).join('');
   $('tab-hero').innerHTML =
    `<div class="card"><b>Профиль</b>
     <div>Имя: <b>${esc(h.name)}</b> · Пол: <b>${h.gender==='female'?'Ж':'М'}</b></div>
@@ -181,13 +183,14 @@ function renderHero(){
   const eq = $('eqlist');
   eq.innerHTML = (h.equipped||[]).length ? '' : '<div class="mut">Ничего не надето</div>';
   (h.equipped||[]).forEach(e => { const row = document.createElement('div');
-    row.className = 'row'; row.appendChild(thumb(e.img));
+    row.className = 'row'; row.appendChild(thumbEl(e.img));
     row.insertAdjacentHTML('beforeend',
-      `<div><b>${SLOT_RU[e.slot]||e.slot}</b>: ${esc(e.name)}</div>`);
+      `<div><b>${esc(e.slot)}</b>: ${esc(e.name)}</div>`);
     eq.appendChild(row); });
-  const bi = document.createElement('img'); bi.className='big';
-  blobInto(bi, h.image); $('heroimg').appendChild(bi);
+  const bi = thumbEl(h.image, 'big'); $('heroimg').appendChild(bi);
 }
+function thumbEl(path, cls){ const i = document.createElement('img');
+  i.className = cls || 'thumb'; blobInto(i, path); return i; }
 async function heroEdit(){
   const h = S.hero;
   $('tab-hero').insertAdjacentHTML('afterbegin',
@@ -199,7 +202,7 @@ async function heroEdit(){
     <label class="mut">Должность</label><input id="e_position" value="${esc(h.position||'')}">
     <label class="mut">Статы (числа)</label>
     ${Object.entries(h.stats||{}).map(([k,v]) =>
-      `<div class="row"><span class="mut" style="flex:1">${STAT_RU[k]||k}</span>
+      `<div class="row"><span class="mut" style="flex:1">${k}</span>
        <input type="number" data-f="${k}" value="${v}" style="width:90px"></div>`).join('')}
     <button class="btn" onclick="heroSave()">💾 Сохранить</button>
     <button class="btn sec" onclick="$('editbox').remove()">↩ Отмена</button></div>`);
@@ -224,7 +227,7 @@ async function upHero(inp){
 function renderItems(){
   $('tab-items').innerHTML = (S.inventory||[]).map(i =>
    `<div class="card"><div class="row" data-img="${i.inv}"></div>
-    <div class="mut">слот: ${SLOT_RU[i.slot]||i.slot} · качество ${i.quality} · ×${i.qty}</div>
+    <div class="mut">слот: ${esc(i.slot)} · качество ${i.quality} · ×${i.qty}</div>
     <div class="mut">${esc(i.desc||'')}</div>
     ${i.slot==='consumable'
       ? `<button class="btn" onclick="act('use_item',{inv:${i.inv}})">Использовать</button>` : ''}
@@ -235,7 +238,7 @@ function renderItems(){
   ).join('') || '<div class="card mut">Инвентарь пуст</div>';
   (S.inventory||[]).forEach(i => {
     const row = document.querySelector(`#tab-items [data-img="${i.inv}"]`);
-    if(row){ row.appendChild(thumb(i.img));
+    if(row){ row.appendChild(thumbEl(i.img));
       row.insertAdjacentHTML('beforeend', `<div><b>${esc(i.name)}</b></div>`); } });
 }
 function renderQuests(){
@@ -255,7 +258,7 @@ function renderMap(){
   ).join('');
   (S.locations||[]).forEach(l => {
     const row = document.querySelector(`#tab-map [data-img="${l.id}"]`);
-    if(row){ row.appendChild(thumb(l.image));
+    if(row){ row.appendChild(thumbEl(l.image));
       row.insertAdjacentHTML('beforeend',
         `<div><b>${esc(l.name)}</b> ${l.current?'📍':''}${l.safe?'🛡️':''}</div>`); } });
 }
@@ -264,7 +267,8 @@ function renderParty(){
   $('tab-party').innerHTML = `<div class="card"><b>👥 Группа (${p.length}/10)</b>
    ${p.map(n => `<div class="row"><div style="flex:1">
      <b>${esc(n.name)}</b> <span class="mut">ур.${n.level} · ${esc(n.race||'')}</span>
-     ${bar(n.hp, n.max_hp)}</div>
+     <div class="bar"><i style="width:${n.max_hp?Math.max(0,Math.min(100,n.hp*100/n.max_hp)):0}%"></i></div>
+     <span class="mut">${n.hp}/${n.max_hp}</span></div>
      <button class="btn sec" onclick="kick(${n.id})">Исключить</button></div>`).join('')
      || '<div class="mut">Группа пуста. Добавь в чате: «возьми X в группу» или /party add &lt;id&gt;</div>'}</div>`;
 }
@@ -302,6 +306,7 @@ async function loadRelations(){
    ${(r.relationships||[]).map(x =>
      `<div class="row"><div style="flex:1"><b>${esc(x.name)}</b>
       <div class="mut">${esc(x.type||'')} · тепло ${x.warmth}</div>
+      <div class="bar"><i style="width:${Math.max(0,Math.min(100,x.warmth))}%"></i></div>
       <div class="mut">I${x.intimacy} P${x.passion} C${x.commitment} K${x.conflict}</div></div></div>`).join('')
      || '<div class="mut">Пока ни с кем не знаком</div>'}</div>`;
 }
@@ -318,7 +323,7 @@ async function loadEncy(sub){
   ).join('') || '<div class="card mut">Пусто</div>';
   (r.rows||[]).forEach(x => {
     const row = document.querySelector(`#encylist [data-img="${x.id}"]`);
-    if(row){ row.appendChild(thumb(x.img));
+    if(row){ row.appendChild(thumbEl(x.img));
       row.insertAdjacentHTML('beforeend', `<div><b>${esc(x.name)}</b></div>`); } });
 }
 async function openEncy(entity, id){
@@ -335,8 +340,7 @@ async function openEncy(entity, id){
    <label class="btn sec" style="display:inline-block">📤 Загрузить
    <input type="file" hidden accept="image/*" onchange="encyUp(this)"></label>
    <button class="btn sec" onclick="$('encycard').innerHTML=''">↩ Закрыть</button></div>`;
-  const bi = document.createElement('img'); bi.className='big';
-  blobInto(bi, r.rec.image_media_id); $('encimg').appendChild(bi);
+  $('encimg').appendChild(thumbEl(r.rec.image_media_id, 'big'));
 }
 function encyEdit(){
   const rec = EDIT.rec;
@@ -347,9 +351,6 @@ function encyEdit(){
    `<div class="card" id="encedit"><b>Редактор полей</b>` +
    Object.entries(rec).filter(([k]) => !skip.has(k)).map(([k,v]) => {
      const val = v==null ? '' : (typeof v==='object' ? JSON.stringify(v) : String(v));
-     if(BOOL_FIELDS.has(k))
-       return `<label class="mut"><input type="checkbox" data-f="${k}"
-         ${+v===1?'checked':''} style="width:auto"> ${k}</label>`;
      return `<label class="mut">${k}</label>` + (val.length > 60
        ? `<textarea data-f="${k}" rows="2">${esc(val)}</textarea>`
        : `<input data-f="${k}" value="${esc(val)}">`);
@@ -359,8 +360,7 @@ function encyEdit(){
 }
 async function encySave(){
   const f = {};
-  document.querySelectorAll('#encedit [data-f]').forEach(i =>
-    f[i.dataset.f] = i.type === 'checkbox' ? (i.checked ? 1 : 0) : i.value);
+  document.querySelectorAll('#encedit [data-f]').forEach(i => f[i.dataset.f] = i.value);
   await api('/api/ency/update', {entity:EDIT.entity, id:EDIT.id, fields:f});
   const eb = $('encedit'); if(eb) eb.remove();
   loadEncy(); openEncy(EDIT.entity, EDIT.id);
@@ -407,7 +407,7 @@ function renderWorlds(){
   ).join('');
   (S.scenarios||[]).forEach(w => {
     const row = document.querySelector(`#tab-worlds [data-img="${w.id}"]`);
-    if(row){ row.appendChild(thumb(w.image));
+    if(row){ row.appendChild(thumbEl(w.image));
       row.insertAdjacentHTML('beforeend', `<div><b>${esc(w.name)}</b></div>`); } });
 }
 async function resetWorld(id){
