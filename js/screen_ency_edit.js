@@ -6,17 +6,18 @@ v9 (20.09.2026, инцидент «у оружия нет базовых хар�
 base_stat_modifiers / stat_modifiers редактируются statgrid'ом с русскими
 названиями (ТЗ v4 §9.6), а не сырым JSON в «Текстах»: текущие ключи +
 селектор «➕ добавить параметр»; нули при сохранении отбрасываются.
-v10 (20.09.2026, инвариант «любая генерация сопровождается шкалой»):
-в ency_new (экран создания записи) под превью добавлена шкала Prog —
-раньше кнопка 🎨 после создания шла без шкалы (аудит 20.09: вызов
-gen_entity_image без пары Prog.start/Prog.finish).
+v10 (20.09.2026, требование владельца «кнопки секций не помещаются»):
+у ency_edit УБРАН принудительный однорядный seg (flex-wrap:nowrap;
+overflow-x:auto) — кнопки секций переносятся в 2+ ряда дефолтным .seg
+(как категории энциклопедии), ничего не обрезается за краем экрана;
+распространяется на базовых и именных NPC (общий код-путь).
 ency_edit: каноническая запись через /api/ency/get; подвкладки-секции
 (у NPC семантические группы); числовые/переключатели/короткие тексты —
 3 колонки, textarea — во всю ширину; перечисления/флаги — select;
 RACE/FACTION — select из СУЩЕСТВУЮЩИХ; personality_tags — через запятую
 (JSON-массив); outfit_items — textarea с подсказкой; «🎨 Картинка» и
 «📤 Загрузить» со шкалой Prog. ency_new: создание NPC (пресет расы/фракции)
-или предмета + 🎨/📤/✏️ после создания (🎨 теперь со шкалой). */
+или предмета + 🎨//✏️ после создания. */
 (function () {
 const SKIP_FIELDS = ["location_id", "item_id", "effect_id", "race_id",
   "faction_id", "scenario_id", "npc_id", "hero_id", "image_media_id",
@@ -174,8 +175,9 @@ Router.register("ency_edit", function (box, params) {
     };
     up.appendChild(fi); ib.appendChild(up);
     box.appendChild(ib);
+    /* v10: seg БЕЗ принудительного nowrap — кнопки секций переносятся
+       в 2+ ряда дефолтным .seg (как категории энциклопедии). */
     const seg = Router.el("div", "seg");
-    seg.style.cssText = "flex-wrap:nowrap;overflow-x:auto;";
     box.appendChild(seg);
     const wrap = Router.el("div");
     box.appendChild(wrap);
@@ -407,7 +409,7 @@ Router.register("ency_new", function (box, params) {
     const im = Router.el("img", "imgfull");
     im.style.display = "none";
     pc.appendChild(im);
-    /* v10: шкала генерации на экране создания записи */
+    /* v10 (инвариант 12.39): шкала генерации на экране создания записи */
     const prog = Prog.create();
     pc.appendChild(prog);
     box.appendChild(pc);
