@@ -38,15 +38,20 @@
   overflow:visible !important;max-height:none !important;
   flex:0 0 auto;box-sizing:border-box;}
 #nav .backrow{padding:6px 10px 0;border-top:1px solid #2d2547;}
-/* Компоновка: шапка / скролл-контент / навигация с кнопкой «Назад». */
+/* Компоновка v13 (20.09.2026, требование владельца «шапка занимает слишком
+   много места»): шапка БОЛЬШЕ не закреплена — она лежит ВНУТРИ скролл-
+   контейнера #scrollwrap и уезжает вверх вместе с контентом; #screen —
+   только обёртка контента (её чистит роутер, шапка не теряется);
+   навигация остаётся внизу экрана. */
 html,body{height:100%;margin:0;overflow:hidden;}
 body{display:flex;flex-direction:column;}
-#hdr{flex:0 0 auto;}
-#screen{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding-bottom:8px;box-sizing:border-box;}
+#scrollwrap{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  box-sizing:border-box;}
+#screen{padding-bottom:8px;box-sizing:border-box;}
 </style>
 </head>
 <body>
+<div id="scrollwrap">
 <header id="hdr">
   <div id="hdr-bg"></div>
   <div id="hdr-col">
@@ -57,6 +62,7 @@ body{display:flex;flex-direction:column;}
 </header>
 
 <main id="screen"></main>
+</div>
 <!-- Кнопка «↩ Назад» вставляется роутером ПЕРВОЙ строкой внутрь #nav (v12);
      отдельного плавающего блока больше нет — перекрывать/затирать нечего. -->
 <nav id="nav"></nav>
@@ -65,7 +71,7 @@ body{display:flex;flex-direction:column;}
      НЕ подключать (дубли/битые): js/inventory_shared.js, js/screen_items.js,
      js/screen_wardrobe.js -->
 <script>
-var APP_VERSION = 81;
+var APP_VERSION = 82;
 var APP_SCRIPTS = [
   'js/api.js','js/router.js','js/dict_ru.js',
   'js/screen_home.js','js/screen_hero.js',
