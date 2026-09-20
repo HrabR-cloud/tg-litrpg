@@ -6,7 +6,11 @@ ruLabel, ruValue, safeParse, groupSlots, skillParamsLine, ITEM_GROUPS.
 z-index'ом навигации или стереть перерисовкой экрана (навигацию чистит
 только buildNav при старте, и сразу после неё кнопка возвращается).
 viewBar/editBar свою «Назад» НЕ печатают (единственный источник — nav).
-ВНИМАНИЕ (R-08): вход = просмотр; правка только через «✏️ Изменить». */
+ВНИМАНИЕ (R-08): вход = просмотр; правка только через «✏️ Изменить».
+v13 (20.09.2026, требование владельца «шапка занимает слишком много
+места»): шапка перенесена ВНУТРЬ скролл-контейнера #scrollwrap (menu.html)
+и уезжает вверх при скролле; render() дополнительно сбрасывает scrollTop
+обёртки (fallback #screen — совместимость со старым menu.html). */
 const GENDER_RU = { male: "Мужчина", female: "Женщина" };
 const AGE_RU = { child: "Ребёнок", young: "Молодой", mature: "Зрелый", old: "Старый" };
 const RARITY_RU = { common: "обычный", uncommon: "необычный", rare: "редкий",
@@ -132,6 +136,10 @@ const Router = {
     this.ensureBackBar();
     setTimeout(function () { Router.ensureBackBar(); }, 400);
     box.scrollTop = 0;
+    /* v13: скролл-контейнер теперь #scrollwrap (шапка скроллится вместе
+       с контентом); сбрасываем его позицию наверх при каждой перерисовке */
+    const sw = document.getElementById("scrollwrap");
+    if (sw) sw.scrollTop = 0;
     this.markNav();
   },
   /* ЕДИНСТВЕННАЯ «↩ Назад»: первая строка ВНУТРИ #nav (v12) — не перекрывается
@@ -187,8 +195,8 @@ const Router = {
       (st.hero.position ? ` · ${st.hero.position}` : "");
     const chips = document.getElementById("hdr-chips");
     chips.innerHTML = "";
-    [ `⭐ Ур. ${st.hero.level}`, `💰 ${st.hero.gold}`,
-      `❤️ ${st.hero.hp}/${st.hero.max_hp}`, `🌍 ${st.scenario.name}` ]
+    [`⭐ Ур. ${st.hero.level}`, `💰 ${st.hero.gold}`,
+     `❤️ ${st.hero.hp}/${st.hero.max_hp}`, `🌍 ${st.scenario.name}`]
       .forEach(t => chips.appendChild(Router.el("span", "chip", t)));
   },
   async headerImages() {
