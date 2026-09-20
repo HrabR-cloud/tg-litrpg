@@ -2,433 +2,94 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#14101f">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>LitRPG Меню</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- ЕДИНСТВЕННАЯ строка стилей: css/menu.css -->
+<link rel="stylesheet" href="css/menu.css?v=23">
 <style>
-:root{--bg:#12101c;--bar:#241d38;--card:#262138;--card2:#2e2846;--acc:#7c5cff;
---txt:#f2efff;--mut:#9d94c0}
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
-body{background:var(--bg);color:var(--txt);padding-bottom:78px}
-header{background:linear-gradient(180deg,#8a70f0 0%,#6a4fe0 70%,#5f45d8 100%);
-padding:22px 16px 20px;text-align:center}
-#avatar{width:112px;height:112px;border-radius:50%;margin:0 auto 12px;
-background:#9d8bf0 center/cover no-repeat;border:3px solid #ffffff40;
-display:flex;align-items:center;justify-content:center;font-size:46px;overflow:hidden}
-#hworld{font-size:19px;font-weight:700;margin-bottom:4px}
-#hhello{font-size:13px;opacity:.85;margin-bottom:12px}
-#chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-#chips span{background:#3a2d7acc;border-radius:14px;padding:5px 12px;font-size:12px}
-#secbar{background:var(--bar);padding:12px 16px;font-weight:600;font-size:15px;
-display:flex;gap:8px;align-items:center}
-main{padding:12px;max-width:760px;margin:0 auto}
-section{display:none}section.on{display:block}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px}
-.grid .card{margin-bottom:0;cursor:pointer}
-.card .ico{font-size:26px;margin-bottom:8px}
-.card b{display:block;font-size:15px;margin-bottom:4px}
-.mut{color:var(--mut);font-size:12px}
-.row{display:flex;gap:10px;align-items:center;margin:6px 0}
-.btn{background:var(--acc);border:none;color:#fff;border-radius:10px;
-padding:9px 12px;margin:2px;font-size:13px;cursor:pointer}
-.btn.sec{background:var(--card2);border:1px solid #3a3355}
-input,select,textarea{width:100%;background:#191430;border:1px solid #352a55;
-border-radius:10px;color:var(--txt);padding:9px;margin:4px 0;font-size:13px}
-.sub{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
-img.thumb{width:56px;height:56px;object-fit:cover;border-radius:10px;background:#332a55;flex:0 0 auto}
-img.big{width:100%;border-radius:12px;margin:6px 0;background:#332a55}
-.bar{height:8px;border-radius:4px;background:#332a55;overflow:hidden;margin:3px 0}
-.bar i{display:block;height:100%;background:#4caf50}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;gap:2px;overflow-x:auto;
-background:#17131fee;border-top:1px solid #2c2545;backdrop-filter:blur(6px);z-index:9}
-nav button{flex:0 0 auto;min-width:52px;padding:8px 4px;background:none;border:none;
-color:var(--mut);font-size:10px;cursor:pointer}
-nav button .e{display:block;font-size:17px;margin-bottom:2px}
-nav button.on{color:#fff;background:var(--acc);border-radius:12px}
-#arblog{max-height:46vh;overflow-y:auto}
+/* Фикс 18.09.2026: аватар героя — ПО ЦЕНТРУ шапки и БЕЗ прозрачности. */
+#hdr{position:relative;overflow:hidden;display:block !important;text-align:center;}
+#hdr-bg{position:absolute !important;left:0 !important;top:0 !important;
+  width:100% !important;height:100% !important;inset:0 !important;
+  background-size:cover;background-position:center top;opacity:.55;z-index:0;}
+#hdr-col{position:relative;z-index:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;gap:6px;
+  padding:14px 12px 12px;min-height:212px;box-sizing:border-box;}
+#hdr-avatar{position:relative !important;left:auto !important;right:auto !important;
+  top:auto !important;bottom:auto !important;transform:none !important;
+  float:none !important;margin:0 auto !important;opacity:1 !important;
+  width:92px !important;height:92px !important;border-radius:50% !important;
+  overflow:hidden;background:#2d2547;border:3px solid rgba(255,255,255,.4);
+  display:flex;align-items:center;justify-content:center;font-size:40px;}
+#hdr-avatar img{width:100%;height:100%;object-fit:cover;
+  border-radius:50%;opacity:1 !important;}
+#hdr-name{position:relative;opacity:1 !important;color:#fff;font-weight:600;
+  text-shadow:0 1px 4px rgba(0,0,0,.6);}
+#hdr-chips{position:relative;opacity:1 !important;display:flex;flex-wrap:wrap;
+  gap:6px;justify-content:center;}
+/* Фикс 19.09.2026 v12: навигация — обычный блок внизу (НЕ fixed), чтобы
+   строка «↩ Назад» внутри неё не участвовала в войнах z-index/fixed. */
+#nav{position:static !important;z-index:auto !important;
+  overflow:visible !important;max-height:none !important;
+  flex:0 0 auto;box-sizing:border-box;}
+#nav .backrow{padding:6px 10px 0;border-top:1px solid #2d2547;}
+/* Компоновка: шапка / скролл-контент / навигация с кнопкой «Назад». */
+html,body{height:100%;margin:0;overflow:hidden;}
+body{display:flex;flex-direction:column;}
+#hdr{flex:0 0 auto;}
+#screen{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:8px;box-sizing:border-box;}
 </style>
 </head>
 <body>
-<header>
-<div id="avatar">👤</div>
-<div id="hworld"></div>
-<div id="hhello"></div>
-<div id="chips"></div>
+<header id="hdr">
+  <div id="hdr-bg"></div>
+  <div id="hdr-col">
+    <div id="hdr-avatar">👤</div>
+    <div id="hdr-name">—</div>
+    <div id="hdr-chips"></div>
+  </div>
 </header>
-<div id="secbar"></div>
-<main>
-<section id="tab-home" class="on"></section>
-<section id="tab-hero"></section>
-<section id="tab-items"></section>
-<section id="tab-quests"></section>
-<section id="tab-map"></section>
-<section id="tab-party"></section>
-<section id="tab-time"></section>
-<section id="tab-relations"></section>
-<section id="tab-ency"></section>
-<section id="tab-arb"></section>
-<section id="tab-worlds"></section>
-</main>
+
+<main id="screen"></main>
+<!-- Кнопка «↩ Назад» вставляется роутером ПЕРВОЙ строкой внутрь #nav (v12);
+     отдельного плавающего блока больше нет — перекрывать/затирать нечего. -->
 <nav id="nav"></nav>
+
+<!-- ПОРЯДОК: api → router → dict_ru → экраны → app последним.
+     НЕ подключать (дубли/битые): js/inventory_shared.js, js/screen_items.js,
+     js/screen_wardrobe.js -->
 <script>
-const API = location.hostname.endsWith('github.io')
-  ? 'https://unexpired-pogo-splotchy.ngrok-free.dev' : '';
-const TG = window.Telegram ? window.Telegram.WebApp : null;
-let S = null, EDIT = null, encyCur = 'npc_named';
-const NAV = [['home','🏠','Домой'],['hero','👤','Герой'],['items','🎒','Вещи'],
-['map','🗺️','Карта'],['time','⏰','Время'],['relations','💞','Отношения'],
-['ency','📚','Энцикл.'],['arb','⚖️','Арбитр'],['worlds','🌍','Миры']];
-const HOME_CARDS = [
-['hero','👤','Персонаж','Имя, пол, статы, внешность'],
-['items','🎒','Инвентарь','Карточки вещей с миниатюрами'],
-['quests','📜','Квесты','Активные квесты'],
-['map','🗺️','Карта','Локации и перемещение'],
-['party','👥','Группа','NPC в группе героя'],
-['time','⏰','Время','Перемотка и календарь'],
-['relations','💞','Отношения','Шкалы и типы связей'],
-['ency','📚','Энциклопедия','Мир, NPC, предметы, умения, расы'],
-['arb','⚖️','Арбитр','Вопрос-ответ: правки мира'],
-['worlds','🌍','Миры','Выбор мира, сброс']];
-const ENCY = [['scenario','Мир'],['location','Локации'],
-['npc_base','НПС Базовые'],['npc_named','НПС с Именем'],
-['item','Предметы'],['cskill','Боевые ум.'],['nskill','Мирные ум.'],
-['effect','Эффекты'],['race','Расы'],['faction','Фракции']];
-const $ = id => document.getElementById(id);
-const esc = s => (s==null?'':String(s)).replace(/[<>&]/g,
-  c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
-async function api(p, b){
-  const r = await fetch(API + p, {method:'POST',
-    headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
-    body: JSON.stringify(Object.assign({init_data: TG ? TG.initData : ''}, b || {}))});
-  return r.json();
-}
-async function blobInto(img, path){
-  if(!path){ img.style.visibility='hidden'; return false; }
-  try{
-    const r = await fetch(API + path + '?v=' + Date.now(),
-      {headers:{'ngrok-skip-browser-warning':'1'}});
-    img.src = URL.createObjectURL(await r.blob());
-    img.style.visibility='visible'; return true;
-  }catch(e){ img.style.visibility='hidden'; return false; }
-}
-/* Шапка: круг = иконка героя (fallback 👤), текст = ТОЛЬКО название мира */
-async function header(){
-  const sc = S.scenario, h = S.hero;
-  const av = $('avatar');
-  av.innerHTML = '👤';
-  av.style.backgroundImage = 'none';
-  if(h.image){
-    const probe = new Image();
-    const ok = await new Promise(res => {
-      fetch(API + h.image + '?v=' + Date.now(),
-        {headers:{'ngrok-skip-browser-warning':'1'}})
-        .then(r => r.blob()).then(b => { probe.src = URL.createObjectURL(b);
-          probe.onload = () => res(true); probe.onerror = () => res(false); })
-        .catch(() => res(false));
-    });
-    if(ok){ av.innerHTML = ''; av.style.backgroundImage = `url(${probe.src})`; }
-  }
-  $('hworld').textContent = `<${sc.name}>`;
-  $('hhello').textContent = `Привет, ${h.name}!`;
-  $('chips').innerHTML =
-    `<span>⭐ Ур. ${h.level}</span><span>🪙 ${h.gold}</span>` +
-    `<span>❤️ ${h.hp}/${h.max_hp}</span>` +
-    `<span>🌍 &lt;${sc.name}&gt;</span>`;
-}
-function show(tab){
-  document.querySelectorAll('main section').forEach(s =>
-    s.classList.toggle('on', s.id === 'tab-' + tab));
-  document.querySelectorAll('nav button').forEach(b =>
-    b.classList.toggle('on', b.dataset.t === tab));
-  const h = S ? S.hero : null;
-  const bars = {home:`👤 ${h?h.name:''} · ${h&&h.gender==='female'?'Женщина':'Мужчина'}`,
-    hero:'👤 Персонаж',items:'🎒 Инвентарь',quests:'📜 Квесты',map:'🗺️ Карта',
-    party:'👥 Группа',time:'⏰ Время',relations:'💞 Отношения',
-    ency:'📚 Энциклопедия',arb:'⚖️ Арбитр',worlds:'🌍 Миры'};
-  $('secbar').textContent = bars[tab] || '';
-  if(tab==='time') loadTime();
-  if(tab==='relations') loadRelations();
-  if(tab==='ency') loadEncy();
-}
-function tabs(){
-  $('nav').innerHTML = NAV.map(t =>
-    `<button data-t="${t[0]}"><span class="e">${t[1]}</span>${t[2]}</button>`).join('');
-  $('nav').onclick = e => { const b = e.target.closest('button');
-    if(b) show(b.dataset.t); };
-}
-function renderHome(){
-  $('tab-home').innerHTML = `<div class="grid">` + HOME_CARDS.map(c =>
-    `<div class="card" data-go="${c[0]}"><div class="ico">${c[1]}</div>
-     <b>${c[2]}</b><span class="mut">${c[3]}</span></div>`).join('') + `</div>`;
-  $('tab-home').onclick = e => { const c = e.target.closest('[data-go]');
-    if(c) show(c.dataset.go); };
-}
-function renderHero(){
-  const h = S.hero;
-  const stats = Object.entries(h.stats||{}).map(([k,v]) =>
-    `<div>${k}: <b>${v}</b></div>`).join('');
-  $('tab-hero').innerHTML =
-   `<div class="card"><b>Профиль</b>
-    <div>Имя: <b>${esc(h.name)}</b> · Пол: <b>${h.gender==='female'?'Ж':'М'}</b></div>
-    <div class="mut">${esc(h.position||'')}</div>
-    <button class="btn sec" onclick="heroEdit()">✏️ Изменить</button></div>
-   <div class="card"><b>Характеристики</b>
-    <div class="grid" style="grid-template-columns:1fr 1fr">${stats}</div></div>
-   <div class="card"><b>Экипировка</b><div id="eqlist"></div></div>
-   <div class="card"><b>Внешность</b><div id="heroimg"></div>
-    <div class="mut" id="heroprompt">${esc(h.image_prompt||'')}</div>
-    <button class="btn" onclick="genHero()">🎨 Сгенерировать</button>
-    <label class="btn sec" style="display:inline-block">📤 Загрузить
-    <input type="file" hidden accept="image/*" onchange="upHero(this)"></label></div>`;
-  const eq = $('eqlist');
-  eq.innerHTML = (h.equipped||[]).length ? '' : '<div class="mut">Ничего не надето</div>';
-  (h.equipped||[]).forEach(e => { const row = document.createElement('div');
-    row.className = 'row'; row.appendChild(thumbEl(e.img));
-    row.insertAdjacentHTML('beforeend',
-      `<div><b>${esc(e.slot)}</b>: ${esc(e.name)}</div>`);
-    eq.appendChild(row); });
-  const bi = thumbEl(h.image, 'big'); $('heroimg').appendChild(bi);
-}
-function thumbEl(path, cls){ const i = document.createElement('img');
-  i.className = cls || 'thumb'; blobInto(i, path); return i; }
-async function heroEdit(){
-  const h = S.hero;
-  $('tab-hero').insertAdjacentHTML('afterbegin',
-   `<div class="card" id="editbox"><b>✏️ Редактор персонажа</b>
-    <label class="mut">Имя</label><input id="e_name" value="${esc(h.name)}">
-    <label class="mut">Пол</label><select id="e_gender">
-     <option value="male" ${h.gender==='male'?'selected':''}>Мужской</option>
-     <option value="female" ${h.gender==='female'?'selected':''}>Женский</option></select>
-    <label class="mut">Должность</label><input id="e_position" value="${esc(h.position||'')}">
-    <label class="mut">Статы (числа)</label>
-    ${Object.entries(h.stats||{}).map(([k,v]) =>
-      `<div class="row"><span class="mut" style="flex:1">${k}</span>
-       <input type="number" data-f="${k}" value="${v}" style="width:90px"></div>`).join('')}
-    <button class="btn" onclick="heroSave()">💾 Сохранить</button>
-    <button class="btn sec" onclick="$('editbox').remove()">↩ Отмена</button></div>`);
-}
-async function heroSave(){
-  const f = {name:$('e_name').value, gender:$('e_gender').value,
-    position:$('e_position').value};
-  document.querySelectorAll('#editbox [data-f]')
-    .forEach(i => f[i.dataset.f] = +i.value);
-  await api('/api/ency/update', {entity:'hero', id:S.hero.id, fields:f});
-  const eb = $('editbox'); if(eb) eb.remove();
-  load();
-}
-async function genHero(){ await api('/api/gen_hero_image', {}); load(); }
-async function upHero(inp){
-  const f = inp.files[0]; if(!f) return;
-  const fd = new FormData(); fd.append('file', f);
-  await fetch(API + `/api/upload_entity_image?entity=hero&id=${S.hero.id}`,
-    {method:'POST', body:fd, headers:{'ngrok-skip-browser-warning':'1'}});
-  load();
-}
-function renderItems(){
-  $('tab-items').innerHTML = (S.inventory||[]).map(i =>
-   `<div class="card"><div class="row" data-img="${i.inv}"></div>
-    <div class="mut">слот: ${esc(i.slot)} · качество ${i.quality} · ×${i.qty}</div>
-    <div class="mut">${esc(i.desc||'')}</div>
-    ${i.slot==='consumable'
-      ? `<button class="btn" onclick="act('use_item',{inv:${i.inv}})">Использовать</button>` : ''}
-    ${['consumable','quest'].includes(i.slot) ? ''
-      : (i.equipped
-        ? `<button class="btn sec" onclick="act('unequip',{slot:'${i.slot}'})">Снять</button>`
-        : `<button class="btn" onclick="act('equip',{inv:${i.inv}})">Надеть</button>`)}</div>`
-  ).join('') || '<div class="card mut">Инвентарь пуст</div>';
-  (S.inventory||[]).forEach(i => {
-    const row = document.querySelector(`#tab-items [data-img="${i.inv}"]`);
-    if(row){ row.appendChild(thumbEl(i.img));
-      row.insertAdjacentHTML('beforeend', `<div><b>${esc(i.name)}</b></div>`); } });
-}
-function renderQuests(){
-  $('tab-quests').innerHTML = (S.quests||[]).map(q =>
-   `<div class="card"><b>${esc(q.name)}</b>
-    <div class="mut">${esc(q.desc||'')}</div>
-    <button class="btn sec" onclick="act('quest_decline',{quest:${q.id}})">Отказаться</button></div>`
-  ).join('') || '<div class="card mut">Нет активных квестов</div>';
-}
-function renderMap(){
-  $('tab-map').innerHTML = (S.locations||[]).map(l =>
-   `<div class="card"><div class="row" data-img="${l.id}"></div>
-    <div class="mut">${esc((l.desc||'').slice(0,140))}</div>
-    ${l.current ? '<div class="mut">📍 Ты здесь</div>'
-      : `<button class="btn" onclick="act('travel',{loc:${l.id}})">🚶 Переместиться</button>`}
-    <button class="btn sec" onclick="openEncy('location',${l.id})">✏️ Редактировать</button></div>`
-  ).join('');
-  (S.locations||[]).forEach(l => {
-    const row = document.querySelector(`#tab-map [data-img="${l.id}"]`);
-    if(row){ row.appendChild(thumbEl(l.image));
-      row.insertAdjacentHTML('beforeend',
-        `<div><b>${esc(l.name)}</b> ${l.current?'📍':''}${l.safe?'🛡️':''}</div>`); } });
-}
-function renderParty(){
-  const p = S.party || [];
-  $('tab-party').innerHTML = `<div class="card"><b>👥 Группа (${p.length}/10)</b>
-   ${p.map(n => `<div class="row"><div style="flex:1">
-     <b>${esc(n.name)}</b> <span class="mut">ур.${n.level} · ${esc(n.race||'')}</span>
-     <div class="bar"><i style="width:${n.max_hp?Math.max(0,Math.min(100,n.hp*100/n.max_hp)):0}%"></i></div>
-     <span class="mut">${n.hp}/${n.max_hp}</span></div>
-     <button class="btn sec" onclick="kick(${n.id})">Исключить</button></div>`).join('')
-     || '<div class="mut">Группа пуста. Добавь в чате: «возьми X в группу» или /party add &lt;id&gt;</div>'}</div>`;
-}
-async function kick(id){
-  if(!confirm('Исключить из группы?')) return;
-  await api('/api/ency/update', {entity:'npc_named', id, fields:{is_in_party:0}});
-  await api('/api/ency/update', {entity:'npc_base', id, fields:{is_in_party:0}});
-  load();
-}
-async function loadTime(){
-  const t = await api('/api/time', {});
-  const mod = t.minute_of_day != null ? t.minute_of_day : 480;
-  const ev = Math.max(5, 1080 - mod), ni = Math.max(5, 1320 - mod),
-        mo = (1440 - mod) + 480;
-  $('tab-time').innerHTML = `<div class="card"><b>⏰ Время</b>
-   <div>${esc(t.date||t.game_date||'')} · <b>${esc(t.time||'')}</b></div>
-   <div class="mut">Сезон: ${esc(t.season||'')} · Погода: ${esc(t.weather||'')} ·
-    ${t.temperature_c!=null ? t.temperature_c+'°C' : ''}</div>
-   <button class="btn sec" onclick="adv(30)">+30 мин</button>
-   <button class="btn sec" onclick="adv(60)">+1 час</button>
-   <button class="btn sec" onclick="adv(180)">+3 часа</button>
-   <button class="btn" onclick="adv(${ev})">Сегодня вечер</button>
-   <button class="btn" onclick="adv(${ni})">Сегодня ночь</button>
-   <button class="btn" onclick="adv(${mo})">Завтра утро</button>
-   <label class="mut">Точная перемотка (минут)</label>
-   <input id="tmin" type="number" placeholder="Например 240">
-   <button class="btn" onclick="adv(+$('tmin').value||0)">⌨️ Перемотать</button>
-   <div class="mut">Календарь с праздниками — команда /calendar в чате</div></div>`;
-}
-async function adv(m){ if(!m) return; await api('/api/advance_time', {minutes:m});
-  alert('⏩ Время перемотано'); load(); loadTime(); }
-async function loadRelations(){
-  const r = await api('/api/relationships', {});
-  $('tab-relations').innerHTML = `<div class="card"><b>💞 Отношения</b>
-   ${(r.relationships||[]).map(x =>
-     `<div class="row"><div style="flex:1"><b>${esc(x.name)}</b>
-      <div class="mut">${esc(x.type||'')} · тепло ${x.warmth}</div>
-      <div class="bar"><i style="width:${Math.max(0,Math.min(100,x.warmth))}%"></i></div>
-      <div class="mut">I${x.intimacy} P${x.passion} C${x.commitment} K${x.conflict}</div></div></div>`).join('')
-     || '<div class="mut">Пока ни с кем не знаком</div>'}</div>`;
-}
-async function loadEncy(sub){
-  if(sub) encyCur = sub;
-  $('tab-ency').innerHTML = `<div class="sub">${ENCY.map(e =>
-    `<button class="btn ${e[0]===encyCur?'':'sec'}"
-      onclick="loadEncy('${e[0]}')">${e[1]}</button>`).join('')}</div>
-   <div id="encylist"></div><div id="encycard"></div>`;
-  const r = await api('/api/ency/list', {entity: encyCur});
-  $('encylist').innerHTML = (r.rows||[]).map(x =>
-   `<div class="card"><div class="row" data-img="${x.id}"></div>
-    <button class="btn sec" onclick="openEncy('${encyCur}',${x.id})">✏️ Изменить</button></div>`
-  ).join('') || '<div class="card mut">Пусто</div>';
-  (r.rows||[]).forEach(x => {
-    const row = document.querySelector(`#encylist [data-img="${x.id}"]`);
-    if(row){ row.appendChild(thumbEl(x.img));
-      row.insertAdjacentHTML('beforeend', `<div><b>${esc(x.name)}</b></div>`); } });
-}
-async function openEncy(entity, id){
-  const r = await api('/api/ency/get', {entity, id});
-  if(!r.ok) return;
-  EDIT = {entity, id, rec: r.rec};
-  const skip = new Set(['image_media_id']);
-  const rows = Object.entries(r.rec).filter(([k,v]) => !skip.has(k) && v != null && v !== '')
-    .map(([k,v]) => `<div class="mut">${k}: <b style="color:var(--txt)">${esc(String(v).slice(0,120))}</b></div>`).join('');
-  $('encycard').innerHTML = `<div class="card"><b>✏️ ${esc(r.rec.name||('#'+id))}</b>
-   <div id="encimg"></div>${rows}
-   <button class="btn" onclick="encyEdit()">✏️ Изменить</button>
-   <button class="btn sec" onclick="encyGen()">🎨 Картинка</button>
-   <label class="btn sec" style="display:inline-block">📤 Загрузить
-   <input type="file" hidden accept="image/*" onchange="encyUp(this)"></label>
-   <button class="btn sec" onclick="$('encycard').innerHTML=''">↩ Закрыть</button></div>`;
-  $('encimg').appendChild(thumbEl(r.rec.image_media_id, 'big'));
-}
-function encyEdit(){
-  const rec = EDIT.rec;
-  const skip = new Set(['npc_id','item_id','location_id','scenario_id','hero_id',
-    'race_id','faction_id','effect_id','combat_skill_id','noncombat_skill_id',
-    'image_media_id']);
-  $('encycard').insertAdjacentHTML('afterbegin',
-   `<div class="card" id="encedit"><b>Редактор полей</b>` +
-   Object.entries(rec).filter(([k]) => !skip.has(k)).map(([k,v]) => {
-     const val = v==null ? '' : (typeof v==='object' ? JSON.stringify(v) : String(v));
-     return `<label class="mut">${k}</label>` + (val.length > 60
-       ? `<textarea data-f="${k}" rows="2">${esc(val)}</textarea>`
-       : `<input data-f="${k}" value="${esc(val)}">`);
-   }).join('') +
-   `<button class="btn" onclick="encySave()">💾 Сохранить</button>
-    <button class="btn sec" onclick="$('encedit').remove()">↩ Отмена</button></div>`);
-}
-async function encySave(){
-  const f = {};
-  document.querySelectorAll('#encedit [data-f]').forEach(i => f[i.dataset.f] = i.value);
-  await api('/api/ency/update', {entity:EDIT.entity, id:EDIT.id, fields:f});
-  const eb = $('encedit'); if(eb) eb.remove();
-  loadEncy(); openEncy(EDIT.entity, EDIT.id);
-}
-async function encyGen(){
-  const t = {npc_base:'npc', npc_named:'npc', item:'item',
-    location:'location', scenario:'scenario'}[EDIT.entity];
-  if(!t) return;
-  await api('/api/gen_entity_image', {entity_type:t, id:EDIT.id});
-  openEncy(EDIT.entity, EDIT.id);
-}
-async function encyUp(inp){
-  const f = inp.files[0]; if(!f) return;
-  const fd = new FormData(); fd.append('file', f);
-  const t = {npc_base:'npc', npc_named:'npc'}[EDIT.entity] || EDIT.entity;
-  await fetch(API + `/api/upload_entity_image?entity=${t}&id=${EDIT.id}`,
-    {method:'POST', body:fd, headers:{'ngrok-skip-browser-warning':'1'}});
-  openEncy(EDIT.entity, EDIT.id);
-}
-function renderArb(){
-  if($('arblog')) return;
-  $('tab-arb').innerHTML = `<div class="card"><b>⚖️ Арбитр</b>
-   <div id="arblog"></div>
-   <div class="row"><input id="arbin" placeholder="Вопрос или правка мира...">
-   <button class="btn" onclick="sendArb()">➤</button></div></div>`;
-}
-async function sendArb(){
-  const txt = $('arbin').value; if(!txt) return;
-  $('arblog').insertAdjacentHTML('beforeend',
-    `<div class="card"><b>Ты:</b> ${esc(txt)}</div>`);
-  $('arbin').value = '';
-  const r = await api('/api/arbiter', {text: txt});
-  $('arblog').insertAdjacentHTML('beforeend',
-    `<div class="card"><b>Арбитр:</b> ${esc(r.reply||r.error||'')}</div>`);
-  $('arblog').scrollTop = 1e6;
-}
-function renderWorlds(){
-  $('tab-worlds').innerHTML = (S.scenarios||[]).map(w =>
-   `<div class="card"><div class="row" data-img="${w.id}"></div>
-    <div class="mut">${esc(w.genre||'')}</div>
-    ${w.active ? '<div class="mut">✅ Активен</div>'
-      : `<button class="btn" onclick="act('switch',{scenario:${w.id}})">Сделать активным</button>`}
-    <button class="btn sec" onclick="resetWorld(${w.id})">♻️ Сбросить всё</button></div>`
-  ).join('');
-  (S.scenarios||[]).forEach(w => {
-    const row = document.querySelector(`#tab-worlds [data-img="${w.id}"]`);
-    if(row){ row.appendChild(thumbEl(w.image));
-      row.insertAdjacentHTML('beforeend', `<div><b>${esc(w.name)}</b></div>`); } });
-}
-async function resetWorld(id){
-  if(!confirm('Сбросить мир? Прогресс героя и именные NPC будут удалены.')) return;
-  await fetch(API + '/api/reset_world', {method:'POST',
-    headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
-    body: JSON.stringify({init_data: TG ? TG.initData : '', scenario_id: id})});
-  alert('♻️ Мир сброшен'); load();
-}
-async function act(a, p){
-  const r = await api('/api/menu/action', {action:a, params:p});
-  if(r && r.error) alert('❌ ' + r.error);
-  load();
-}
-async function load(){
-  S = await api('/api/menu/state', {});
-  if(!S.ok) return;
-  header(); renderHome(); renderHero(); renderItems(); renderQuests();
-  renderMap(); renderParty(); renderWorlds(); renderArb();
-}
-tabs(); show('home'); load();
+var APP_VERSION = 79;
+var APP_SCRIPTS = [
+  'js/api.js','js/router.js','js/dict_ru.js',
+  'js/screen_home.js','js/screen_hero.js',
+  'js/screen_hero_personality.js',
+  'js/screen_npcinv.js','js/screen_inventory.js',
+  'js/screen_item.js','js/screen_npc.js',
+  'js/screen_party.js','js/screen_trade.js',
+  'js/ui_forms.js',
+  'js/screen_ency.js',
+  'js/screen_ency_cards.js',
+  'js/screen_ency_edit.js',
+  'js/screen_face_crop.js',
+  'js/screen_map.js',
+  'js/screen_time.js','js/screen_quests.js',
+  'js/screen_arbiter.js','js/screen_worlds.js',
+  'js/screen_rel.js','js/screen_skill.js',
+  'js/screen_skills.js','js/screen_face.js',
+  'js/screen_wardrobe_edit.js','js/screen_wardrobe_batch.js',
+  'js/ui_progress.js',
+  'js/app.js'
+];
+APP_SCRIPTS.forEach(function(s){
+  document.write('<script src="'+s+'?v='+APP_VERSION+'"><\/script>');
+});
 </script>
 </body>
 </html>
