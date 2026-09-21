@@ -1,12 +1,10 @@
-/* Создание записей энциклопедии (22.09.2026 v2): вынесено из редактора
-(правило ≤300 строк). v1: NPC (пресет расы/фракции) + предмет.
-v2 (22.09.2026, требование владельца «Создать в каждой вкладке»): схемы
-SCHEMAS для effect/location/race/faction/scenario (минимум полей, ТЗ v5
-§2.2); enum element/duration_type — EncyF.enumSelect; родовые enum
-(location_type/location_kind/faction_type) — локальные ENUM_OPTS (зеркало
-серверных ENUMS web_field_rules v3); stat_modifiers — EncyF.makeStatGridField;
-после создания — «🎨» (media v2 знает все типы) / «📤» / «✏️» со шкалой Prog
-(инвариант 12.39). IIFE: локальный Prog не конфликтует с глобальным. */
+/* Создание записей энциклопедии (22.09.2026 v3): вынесено из редактора
+(правило ≤300 строк). v2: схемы SCHEMAS для effect/location/race/faction/
+scenario + NPC/предмет. v3 (22.09.2026, «перевести описание»): селектор
+«Слот» у предмета строится из SLOT_RU (+«Ресурс») — FormField enum показывал
+сырые ключи hand/head/…; enum element/duration_type/damage_type_gci —
+EncyF.enumSelect (RU+эмодзи); после создания — 🎨 (media v2 знает все типы) /
+📤 / ✏️ со шкалой Prog (инвариант 12.39). IIFE: локальный Prog. */
 (function () {
 const Prog = {
   create: function () {
@@ -85,6 +83,19 @@ Router.register("ency_new", function (box, params) {
     stores[key] = function () { return sel.value; };
     f.appendChild(sel); grid.appendChild(f);
   }
+  /* v3: слот предмета — русские подписи из SLOT_RU + «Ресурс» */
+  function addSlot() {
+    const f = Router.el("div", "field");
+    f.innerHTML = "<label>Слот</label>";
+    const sel = document.createElement("select");
+    sel.appendChild(new Option("(не задано)", ""));
+    Object.entries(SLOT_RU).forEach(function (p) {
+      sel.appendChild(new Option(p[1], p[0]));
+    });
+    sel.appendChild(new Option("Ресурс", "resource"));
+    stores.slot = function () { return sel.value; };
+    f.appendChild(sel); grid.appendChild(f);
+  }
   if (isNpc) {
     add("name", "text", "");
     add("gender", "enum", "male");
@@ -116,7 +127,7 @@ Router.register("ency_new", function (box, params) {
     });
   } else {
     add("name", "text", "");
-    add("slot", "enum", "");
+    addSlot();
     add("rarity", "enum", "common");
     add("quality", "num", 1);
     add("base_price", "num", 10);
