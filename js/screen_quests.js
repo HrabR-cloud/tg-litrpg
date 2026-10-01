@@ -9,6 +9,52 @@ Router.register("quests", function (box) {
   const st = Api.stateCache || {};
   const quests = st.quests || [];
   const events = st.events || [];
+  const offers = st.quest_offers || [];
+
+  // === P2-14(б): приём квестов кликом в консоли (меню) ===
+  const oc = Router.card("📥 Предложения квестов", null);
+  if (!offers.length) {
+    oc.appendChild(Router.el("div", "mut", "Новых предложений нет."));
+  }
+  offers.forEach(function (o) {
+    const row = Router.el("div", "listrow");
+    row.innerHTML = "<div style='flex:1;'><b>📜 " + o.name + "</b>" +
+      "<div class='mut'>" + (o.desc || "—") + "</div>" +
+      "<div class='mut'>🎁 Награда: " + (o.reward_exp || 0) + " опыта, " +
+      (o.reward_gold || 0) + " золота</div></div>";
+    const bar = Router.el("div", "bar");
+    bar.style.margin = "0 0 10px 0";
+    const acc = Router.btn("✅ Принять", async function () {
+      try {
+        const r = await Api.post("/api/menu/action",
+          { action: "quest_offer_accept", params: { offer: o.id } });
+        Api.toast(r && r.ok ? "✅ Квест принят" +
+          (r.risk_warning ? " (" + r.risk_warning + ")" : "")
+          : "❌ " + ((r && r.error) || "ошибка"));
+        if (r && r.ok) {
+          await Api.loadState();
+          Router.tab("quests");
+        }
+      } catch (e) { Api.toast("Ошибка сети: " + e.message); }
+    });
+    const dec = Router.btn("❌ Отклонить", async function () {
+      try {
+        const r = await Api.post("/api/menu/action",
+          { action: "quest_offer_decline", params: { offer: o.id } });
+        Api.toast(r && r.ok ? "Квест отклонён"
+          : "❌ " + ((r && r.error) || "ошибка"));
+        if (r && r.ok) {
+          await Api.loadState();
+          Router.tab("quests");
+        }
+      } catch (e) { Api.toast("Ошибка сети: " + e.message); }
+    }, "ghost");
+    bar.appendChild(acc);
+    bar.appendChild(dec);
+    row.appendChild(bar);
+    oc.appendChild(row);
+  });
+  box.appendChild(oc);
 
   const c = Router.card("📜 Активные квесты", null);
   if (!quests.length) {

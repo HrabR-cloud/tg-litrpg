@@ -39,9 +39,12 @@ const SCHEMAS = {
   faction: [["name", "text", ""], ["ideology", "area", ""],
     ["faction_type", "ge", "guild"], ["image_prompt", "area", ""]],
   scenario: [["name", "text", ""], ["genre", "text", ""],
-    ["description", "area", ""], ["image_prompt", "area", ""]]};
+    ["description", "area", ""], ["image_prompt", "area", ""]],
+  craft: [["name", "text", ""], ["required_gold", "num", 0],
+    ["required_skill", "text", ""], ["difficulty", "num", 5],
+    ["required_items", "area", ""]]};
 const TITLE = { effect: "эффект", location: "локация", race: "раса",
-  faction: "фракция", scenario: "мир", item: "предмет" };
+  faction: "фракция", scenario: "мир", item: "предмет", craft: "рецепт" };
 Router.register("ency_new", function (box, params) {
   const entity = params.entity || "npc_named";
   const preset = params.preset || {};

@@ -18,7 +18,7 @@ outfit_items — textarea; «🎨 Картинка»/«📤 Загрузить»
 const SKIP_FIELDS = ["location_id", "item_id", "effect_id", "race_id",
   "faction_id", "scenario_id", "npc_id", "hero_id", "image_media_id",
   "parent_id", "leader_id", "base_stats", "effective_stats",
-  "display_stats", "icon_source_media_id"];
+  "display_stats", "icon_source_media_id", "recipe_id"];
 const NPC_GROUPS = [
   ["Имя и роль", ["name", "gender", "age", "age_category",
     "npc_type", "npc_role", "occupation", "level", "rank", "status",
@@ -191,6 +191,18 @@ Router.register("ency_edit", function (box, params) {
         const ta = document.createElement("textarea");
         ta.value = v == null ? "[]" : v;
         ta.placeholder = '[{"slot":"tops","item_id":12}, …]';
+        stores[key] = function () { return ta.value; };
+        f.appendChild(ta); cur.grid.appendChild(f);
+        return;
+      }
+      if (key === "required_items") {
+        const f = document.createElement("div");
+        f.className = "field";
+        f.style.gridColumn = "1 / -1";
+        f.innerHTML = "<label>" + labL(key) + "</label>";
+        const ta = document.createElement("textarea");
+        ta.value = v == null ? "[]" : v;
+        ta.placeholder = '[{"name":"Железная руда","qty":1}]';
         stores[key] = function () { return ta.value; };
         f.appendChild(ta); cur.grid.appendChild(f);
         return;

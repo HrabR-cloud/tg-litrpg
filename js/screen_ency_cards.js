@@ -188,10 +188,46 @@ Router.register("effect_card", function (box, params) {
   })();
 });
 
+/* v3: карточка рецепта крафта (B-06) — материалы/золото/навык/сложность */
+Router.register("craft_card", function (box, params) {
+  (async function () {
+    box.appendChild(Router.el("div", "mut", "⏳…"));
+    const rec = await fetchRec(box, "craft", params.id);
+    if (!rec) return;
+    box.appendChild(Router.card("🔨 " + (rec.name || ""),
+      Router.el("div", "mut", "Рецепт крафта (детерминированный, без LLM)")));
+    const nums = {};
+    if (rec.difficulty != null) nums["Сложность"] = rec.difficulty;
+    if (rec.required_gold != null) nums["Золото"] = rec.required_gold;
+    if (Object.keys(nums).length)
+      box.appendChild(Router.card("📊 Параметры", Router.statGrid(nums)));
+    if (rec.required_skill)
+      box.appendChild(Router.card("🛠 Требуемый навык",
+        Router.el("div", "mut", rec.required_skill)));
+    let req = [];
+    try { req = JSON.parse(rec.required_items || "[]"); } catch (e) { req = []; }
+    if (Array.isArray(req) && req.length) {
+      const txt = req.map(function (it) {
+        return (it && it.name ? it.name : String(it)) +
+          (it && it.qty ? " × " + it.qty : "");
+      }).join(" · ");
+      box.appendChild(Router.card("🧱 Материалы",
+        Router.el("div", "mut", txt)));
+    }
+    if (rec.result_item_id)
+      box.appendChild(Router.card("📦 Результат",
+        Router.el("div", "mut", "item_id #" + rec.result_item_id)));
+    box.appendChild(Router.viewBar(function () {
+      Router.open("ency_edit", { entity: "craft", id: params.id, rec: rec });
+    }));
+  })();
+});
+
 /* v3: фильтр SKIP_NUMS — служебные *_id не в «Числа» */
 const SKIP_NUMS = ["effect_id", "scenario_id", "npc_id", "item_id",
   "location_id", "race_id", "faction_id", "hero_id", "event_id",
-  "quest_id", "combat_id", "parent_id", "leader_id"];
+  "quest_id", "combat_id", "parent_id", "leader_id", "recipe_id",
+  "result_item_id"];
 
 Router.register("ency_view", function (box, params) {
   (async function () {

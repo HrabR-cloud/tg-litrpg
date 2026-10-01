@@ -118,6 +118,7 @@ const Router = {
     [["quests", "📜", "Квесты"], ["party", "🤝", "Группа"],
      ["ency", "📚", "Энцикл."], ["arb", "⚖️", "Арбитр"],
      ["worlds", "🌍", "Миры"]],
+    [["settings", "⚙️", "Настройки"]],
   ],
   register(id, fn) { this.screens[id] = fn; },
   tab(id) { this.active = id; this.stack = [{ id: id, params: {} }]; this.render(); },

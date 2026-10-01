@@ -3,12 +3,13 @@
    ВНИМАНИЕ: экран САМ запрашивает /api/time при каждом входе — кэш state
    может быть пустым/устаревшим.
    ВНИМАНИЕ (фикс 16.09.2026 v6): перемотка выполняется ДО любых toast;
-   toast безопасен (api.js v6); ретроспектива рисуется карточкой сверху. */
+   toast безопасен (api.js v6); итог перемотки (проза Ведущего, narrative)
+   рисуется карточкой сверху, факты (retrospect) — fallback. */
 Router.register("time", function (box) {
   renderTime(box, null);
 });
 
-async function renderTime(box, retro) {
+async function renderTime(box, retro, narrative) {
   box.innerHTML = "";
   box.appendChild(Router.card(null,
     Router.el("div", "mut", "⏳ Загрузка времени…")));
@@ -19,8 +20,15 @@ async function renderTime(box, retro) {
   } catch (e) { t = null; }
   box.innerHTML = "";
 
-  /* Ретроспективная сводка после перемотки (СС §23.5–23.6) */
-  if (retro && retro.length) {
+  /* Итог перемотки: проза Ведущего (СС §23.6); факты — fallback (СС §23.5) */
+  if (narrative && narrative.trim()) {
+    const nc = Router.card("📜 Итог", null);
+    const pre = Router.el("div", "mut");
+    pre.style.whiteSpace = "pre-wrap";
+    pre.textContent = narrative;
+    nc.appendChild(pre);
+    box.appendChild(nc);
+  } else if (retro && retro.length) {
     const rc = Router.card("📜 За пропущенное время", null);
     retro.forEach(function (f) {
       rc.appendChild(Router.el("div", "listrow", `<div>${f}</div>`));
@@ -102,7 +110,7 @@ async function doRewind(box, body) {
       Api.toast((res && res.error) || "Ошибка перемотки");
       return;
     }
-    await renderTime(box, res.retrospect || []);
+    await renderTime(box, res.retrospect || [], res.narrative || "");
   } catch (e) {
     Api.toast("Ошибка сети: " + e.message);
   }

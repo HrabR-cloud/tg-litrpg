@@ -8,7 +8,8 @@ location→location_card, item→item_card, race→race_card, faction→faction_
 npc_base/npc_named→npc_card, иначе→ency_view. Глобально: lab(). */
 const ENCY_CATS = [["scenario", "🌍", "Мир"], ["location", "🗺️", "Локации"],
   ["npc_base", "👥", "Базовые NPC"], ["npc_named", "🌟", "NPC с именем"],
-  ["item", "🎒", "Предметы"], ["effect", "✨", "Эффекты"],
+  ["item", "🎒", "Предметы"], ["craft", "🔨", "Рецепты"],
+  ["effect", "✨", "Эффекты"],
   ["race", "🧬", "Расы"], ["faction", "🚩", "Фракции"]];
 let ENCY_SEL = null;
 let GEN_TIMER = 0;
@@ -30,6 +31,9 @@ const EXTRA_RU = {
   pregnancy_start_day: "День беременности",
   base_price: "Базовая цена", weight: "Вес", stackable: "Штабелируемый",
   lore: "Лор", two_handed: "Двуручное", equipped: "Экипировано",
+  required_gold: "Золото", required_skill: "Навык", difficulty: "Сложность",
+  required_items: "Материалы (JSON)", result_item_id: "Результат (item_id)",
+  recipe_id: "ID рецепта",
   danger_level: "Уровень опасности", resource_level: "Ресурсы",
   social_level: "Социальность", mystery_level: "Загадочность",
   access_level: "Доступность", faction_control: "Контроль фракции",
@@ -74,6 +78,7 @@ Router.register("ency", function (box) {
     else if (id === "item") Router.open("item_card", { id: r.id });
     else if (id === "race") Router.open("race_card", { id: r.id });
     else if (id === "faction") Router.open("faction_card", { id: r.id });
+    else if (id === "craft") Router.open("craft_card", { id: r.id });
     else if (id === "npc_base" || id === "npc_named")
       Router.open("npc_card", { id: r.id });
     else Router.open("ency_view", { entity: id, id: r.id });
@@ -130,6 +135,7 @@ Router.register("ency", function (box) {
           r.rarity ? RARITY_RU[r.rarity] || r.rarity : "",
           r.gender ? GENDER_RU[r.gender] : "",
           r.level != null ? "ур. " + r.level : "",
+          r.difficulty != null ? "сложн. " + r.difficulty : "",
           r.two_handed ? "двуручное" : ""].filter(Boolean).join(" · ");
         if (meta) tile.appendChild(Router.el("div", "tile-d", meta));
         const dbtn = Router.btn("🗑", function (e) { delRow(e, r); }, "danger");
