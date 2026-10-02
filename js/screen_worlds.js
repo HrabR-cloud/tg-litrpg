@@ -13,6 +13,13 @@ const WORLD_GENRES = [
 ["horror", "👻 Хоррор"],
 ["modern", "🏙️ Современность"],
 ["other", "🎭 Другое"]];
+/* === ГЦ §15 (ADR 13.60): уровни драматичности мира (канон enum) === */
+const DRAMA_LABELS = {
+calm: "🎭 Спокойный", adventure: "🎭 Приключенческий",
+heroic: "🎭 Героический", hardcore: "🎭 Хардкор",
+legend: "🎭 Легенда"
+};
+function dramaLabel(v) { return DRAMA_LABELS[v] || ""; }
 Router.register("worlds", function (box) {
 box.appendChild(Router.el("div", "mut", "⏳…"));
 Api.loadState().then(function () {
@@ -35,7 +42,7 @@ else im.remove();
 c.appendChild(im);
 const chips = Router.el("div", "bar");
 chips.style.flexWrap = "wrap";
-[w.name, w.genre || "", w.active ? "активен" : ""]
+[w.name, w.genre || "", dramaLabel(w.drama), w.active ? "активен" : ""]
 .filter(Boolean).forEach(function (t) {
 chips.appendChild(Router.chip(t));
 });
@@ -218,7 +225,7 @@ if (u) im.src = u; else pc.remove();
 else pc.remove();
 const chips = Router.el("div", "bar");
 chips.style.flexWrap = "wrap";
-[w.name, w.genre || "", w.active ? "активен" : ""]
+[w.name, w.genre || "", dramaLabel(w.drama), w.active ? "активен" : ""]
 .filter(Boolean).forEach(function (t) { chips.appendChild(Router.chip(t)); });
 box.appendChild(chips);
 box.appendChild(Router.card("📖 Описание мира",
@@ -227,6 +234,51 @@ if (w.greeting) {
 box.appendChild(Router.card("💬 Приветствие",
 Router.el("div", "mut", w.greeting)));
 }
+/* === ГЦ §15 (ADR 13.60): настройка драматичности мира === */
+const dramaCard = Router.card("🎭 Драматичность", null);
+const dramaBody = Router.el("div", "mut", "⏳…");
+dramaCard.appendChild(dramaBody);
+box.appendChild(dramaCard);
+function renderDrama(state) {
+dramaBody.innerHTML = "";
+if (!state || !state.ok) {
+dramaBody.textContent = "Не удалось загрузить уровень драматичности.";
+return;
+}
+const head = Router.el("div", "bar");
+head.style.flexWrap = "wrap";
+head.appendChild(Router.chip("сейчас: " + state.label));
+dramaBody.appendChild(head);
+(state.facts || []).forEach(function (f) {
+const d = Router.el("div", "mut", f);
+d.style.fontSize = "12px";
+dramaBody.appendChild(d);
+});
+const lvlBar = Router.el("div", "bar");
+lvlBar.style.flexWrap = "wrap";
+(state.levels || []).forEach(function (lv) {
+const active = (lv.value === state.drama_level);
+const b = Router.btn(lv.label, async function () {
+if (active) return;
+b.disabled = true;
+const r = await Api.post("/api/menu/drama",
+{ scenario_id: w.id, drama_level: lv.value });
+if (r && r.ok) {
+Api.toast("🎭 Драматичность: " + r.label);
+Api.loadState();
+renderDrama(r);
+} else {
+Api.toast("❌ " + ((r && r.error) || "ошибка"));
+b.disabled = false;
+}
+}, active ? "primary" : "");
+b.title = lv.desc;
+lvlBar.appendChild(b);
+});
+dramaBody.appendChild(lvlBar);
+}
+Api.post("/api/menu/drama", { scenario_id: w.id })
+.then(renderDrama).catch(function () { renderDrama(null); });
 const bar = Router.el("div", "bar");
 bar.style.flexWrap = "wrap";
 bar.appendChild(Router.btn("✏️ Изменить", async function () {

@@ -29,6 +29,37 @@ async function renderCycles(box) {
   }
   box.appendChild(hc);
 
+  if (d.cycles && d.cycles.length) {
+    const cyc = Router.card("🌍 Текущие циклы", null);
+    d.cycles.forEach(function (c) {
+      cyc.appendChild(Router.el("div", "listrow",
+        `<div>${c.icon} <b>${c.name}</b>: ${c.phase}` +
+        `<div class="mut">${c.text}</div></div>`));
+    });
+    box.appendChild(cyc);
+  }
+
+  if (d.world_events && d.world_events.length) {
+    const we = Router.card("🔥 Активные мировые события", null);
+    d.world_events.forEach(function (e) {
+      we.appendChild(Router.el("div", "listrow",
+        `<div>${e.icon} <b>${e.name}</b> (дни ${e.start_day}–${e.end_day})` +
+        `<div class="mut">${e.description}</div></div>`));
+    });
+    box.appendChild(we);
+  }
+
+  if (d.upcoming_events && d.upcoming_events.length) {
+    const ue = Router.card("⏳ Грядущие мировые события", null);
+    d.upcoming_events.forEach(function (e) {
+      const when = e.in_days === 1 ? "завтра" : ("через " + e.in_days + " дн.");
+      ue.appendChild(Router.el("div", "listrow",
+        `<div>${e.icon} <b>${e.name}</b> · день ${e.day} · ${when}` +
+        `<div class="mut">${e.description}</div></div>`));
+    });
+    box.appendChild(ue);
+  }
+
   const uc = Router.card("🔮 Ближайшие события", null);
   if (d.upcoming && d.upcoming.length) {
     d.upcoming.forEach(function (u) {
