@@ -12,7 +12,9 @@ v3 (20.09.2026, требование владельца «убрать знач�
 v4 (02.10.2026, ADR 13.57, Этап 3.4): карточка «🤰 Беременность» для female —
 тоггл фертильности (POST /api/npc/fertility); выключение НЕМЕДЛЕННО
 сбрасывает текущую беременность (подтверждение при активной беременности);
-состояние приходит в карточке полем npc.fertility. */
+состояние приходит в карточке полем npc.fertility.
+v5 (02.10.2026, ADR 13.63, Этап 3.5): карточка «😊 Настроение» — эмоция,
+сила, затухание (−10 за N тактов) и срок угасания; поле npc.mood. */
 Router.register("npc_card", function (box, params) {
   box.appendChild(Router.el("div", "mut", "⏳…"));
   (async function () {
@@ -130,6 +132,27 @@ Router.register("npc_card", function (box, params) {
         fBody.appendChild(b);
       }
       renderFert(npc.fertility || null);
+    }
+    /* === ADR 13.63 (Этап 3.5): настроение NPC + затухание по тактам === */
+    if (!isBase && npc.mood && npc.mood.ok) {
+      const md = npc.mood;
+      const mCard = Router.card("😊 Настроение (ADR 13.63)", null);
+      if (md.active) {
+        const mchips = Router.el("div", "bar");
+        mchips.style.flexWrap = "wrap";
+        mchips.appendChild(Router.chip(md.icon + " " + md.mood_text));
+        mchips.appendChild(Router.chip("сила " + md.intensity + " (" + md.level_text + ")"));
+        mchips.appendChild(Router.chip("−10 за " + md.decay + " такт."));
+        mCard.appendChild(mchips);
+        mCard.appendChild(Router.el("div", "mut",
+          "Угаснет через ~" + md.hours_to_fade + " такт. (1 такт = 1 игровой час)"
+          + (md.cause ? " · причина: " + md.cause : "")));
+      } else {
+        mCard.appendChild(Router.el("div", "mut",
+          "Эмоции нет — состояние нейтральное. Затухание: −10 интенсивности за "
+          + (md.decay || 6) + " такт.; эмоция и причина задаются в энциклопедии."));
+      }
+      box.appendChild(mCard);
     }
     const sk = res.skills || { combat: [], noncombat: [] };
     const skC = Router.card("⚔️ Умения", null);

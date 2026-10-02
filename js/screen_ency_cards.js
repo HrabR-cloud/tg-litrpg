@@ -1,7 +1,10 @@
 /* Карточки энциклопедии v3 (21.09.2026):
 - effect_card: стихия/длительность/сила/модификаторы статов/описание;
 - ency_view: фильтр SKIP_NUMS — служебные *_id не попадают в «Числа».
-Данные: /api/ency/get, /api/ency/members. Подписи — lab() из screen_ency.js. */
+Данные: /api/ency/get, /api/ency/members. Подписи — lab() из screen_ency.js.
+v4 (02.10.2026, ADR 13.63, Этап 3.5): location_card — чипы тип/вид/точка
+возрождения и карточка «📊 Уровни локации» (danger/resource/social/mystery/
+access) — уровни редактируются в ency_edit, теперь видны и в карточке. */
 
 function encyTiles(box, rows, onclick) {
   const grid = Router.el("div", "grid2");
@@ -140,6 +143,23 @@ Router.register("location_card", function (box, params) {
       const ru = {};
       Object.entries(eff).forEach(function (e) { ru[lab(e[0])] = e[1]; });
       box.appendChild(Router.card("✨ Эффекты локации", Router.statGrid(ru)));
+    }
+    /* === ADR 13.63 (Этап 3.5): вид и уровни локации в энциклопедии === */
+    const lchips = Router.el("div", "bar");
+    lchips.style.flexWrap = "wrap";
+    [ruValue("location_type", rec.location_type),
+     ruValue("location_kind", rec.location_kind),
+     rec.is_safe ? "🛡 точка возрождения" : ""].filter(Boolean)
+      .forEach(function (t) { lchips.appendChild(Router.chip(t)); });
+    box.appendChild(lchips);
+    const lvls = {};
+    [["danger_level", "⚠"], ["resource_level", "💰"], ["social_level", "👥"],
+     ["mystery_level", "🔮"], ["access_level", "🚪"]].forEach(function (p) {
+      if (rec[p[0]] != null) lvls[p[1] + " " + lab(p[0])] = rec[p[0]];
+    });
+    if (Object.keys(lvls).length) {
+      box.appendChild(Router.card("📊 Уровни локации (ADR 13.63)",
+        Router.statGrid(lvls)));
     }
     box.appendChild(Router.viewBar(function () {
       Router.open("ency_edit",
