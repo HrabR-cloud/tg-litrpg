@@ -8,7 +8,11 @@
 без словаря — fallback на исходные ключи.
 v3 (20.09.2026, требование владельца «убрать значок часов»): ячейки
 НАДЕТЫХ слотов экипировки NPC больше не печатают маркер 🕓; пустые слоты
-сохраняют ➕ (единый стиль с экраном героя, screen_hero.js v6). */
+сохраняют ➕ (единый стиль с экраном героя, screen_hero.js v6).
+v4 (02.10.2026, ADR 13.57, Этап 3.4): карточка «🤰 Беременность» для female —
+тоггл фертильности (POST /api/npc/fertility); выключение НЕМЕДЛЕННО
+сбрасывает текущую беременность (подтверждение при активной беременности);
+состояние приходит в карточке полем npc.fertility. */
 Router.register("npc_card", function (box, params) {
   box.appendChild(Router.el("div", "mut", "⏳…"));
   (async function () {
@@ -78,6 +82,54 @@ Router.register("npc_card", function (box, params) {
       box.appendChild(Router.el("div", "mut", mb.enabled
         ? "В старте боя мощь именного врага приводится к 1.2 × (герой + активные спутники)."
         : "Масштабирование мини-боссов выключено (miniboss_enabled = False)."));
+    }
+    /* === ADR 13.57 (Этап 3.4): тоггл беременности female-персонажа === */
+    if (npc.gender === "female") {
+      const fCard = Router.card("🤰 Беременность (ADR 13.57)", null);
+      const fBody = Router.el("div", "mut", "");
+      fCard.appendChild(fBody);
+      box.appendChild(fCard);
+      function renderFert(st) {
+        fBody.innerHTML = "";
+        if (!st || !st.ok) {
+          fBody.textContent = "Не удалось получить состояние беременности.";
+          return;
+        }
+        const total = st.total_days || 270;
+        const head = Router.el("div", "bar");
+        head.style.flexWrap = "wrap";
+        head.appendChild(Router.chip(st.enabled ? "фертильность: вкл" : "фертильность: выкл"));
+        head.appendChild(Router.chip(st.is_pregnant
+          ? ("беременна: " + (st.days || 0) + " / " + total + " дн.")
+          : "не беременна"));
+        if (st.is_pregnant && st.stage_text) head.appendChild(Router.chip(st.stage_text));
+        fBody.appendChild(head);
+        const info = Router.el("div", "mut", st.is_pregnant
+          ? "Выключение фертильности НЕМЕДЛЕННО сбросит текущую беременность (is_pregnant=0, срок и стадия — 0)."
+          : "При включённой фертильности персонаж может забеременеть по цепочке " + total + " игровых дней.");
+        info.style.fontSize = "12px";
+        fBody.appendChild(info);
+        const b = Router.btn(st.enabled ? "🚫 Отключить фертильность" : "✅ Включить фертильность",
+          async function () {
+            if (st.enabled && st.is_pregnant &&
+              !confirm("Отключить фертильность и НЕМЕДЛЕННО сбросить текущую беременность?")) return;
+            b.disabled = true;
+            const r = await Api.post("/api/npc/fertility",
+              { npc_id: npc.npc_id, enabled: !st.enabled });
+            if (r && r.ok) {
+              Api.toast(r.pregnancy_reset
+                ? "🚼 Фертильность выключена, беременность сброшена"
+                : (r.enabled ? "✅ Фертильность включена" : "🚫 Фертильность выключена"));
+              Api.loadState();
+              renderFert(r);
+            } else {
+              Api.toast("❌ " + ((r && r.error) || "ошибка"));
+              b.disabled = false;
+            }
+          }, st.enabled ? "ghost" : "primary");
+        fBody.appendChild(b);
+      }
+      renderFert(npc.fertility || null);
     }
     const sk = res.skills || { combat: [], noncombat: [] };
     const skC = Router.card("⚔️ Умения", null);
