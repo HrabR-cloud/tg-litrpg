@@ -66,6 +66,19 @@ Router.register("npc_card", function (box, params) {
     if (Object.keys(stats).length) {
       box.appendChild(Router.card("📊 Характеристики (с бонусами)", Router.statGrid(stats)));
     }
+    /* === ADR 13.53 (Этап 3.3): именной NPC — мини-босс === */
+    if (!isBase && npc.miniboss && npc.miniboss.is_boss) {
+      const mb = npc.miniboss;
+      const mstats = {};
+      mstats["Бюджет боя (×" + mb.ratio + " партии)"] = mb.budget;
+      mstats["Мощь партии (герой + спутники)"] = mb.party_power;
+      mstats["Мощь NPC сейчас"] = mb.npc_power;
+      mstats["Шаг к бюджету в бою"] = "×" + mb.factor;
+      box.appendChild(Router.card("🎯 Мини-босс (ADR 13.53)", Router.statGrid(mstats)));
+      box.appendChild(Router.el("div", "mut", mb.enabled
+        ? "В старте боя мощь именного врага приводится к 1.2 × (герой + активные спутники)."
+        : "Масштабирование мини-боссов выключено (miniboss_enabled = False)."));
+    }
     const sk = res.skills || { combat: [], noncombat: [] };
     const skC = Router.card("⚔️ Умения", null);
     [["combat", "cskill", "⚔️ Боевые"], ["noncombat", "nskill", "🕊️ Мирные"]]
