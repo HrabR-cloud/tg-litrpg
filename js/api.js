@@ -3,16 +3,19 @@
    ВНИМАНИЕ (16.09.2026): thumb()/imgT() — списки грузят МИНИАТЮры (быстрее);
    full — только карточки просмотра и шапка.
    ВНИМАНИЕ: toast() безопасен вне Telegram. */
+const QS = new URLSearchParams(location.search), API_TOKEN = QS.get("token") || "", API_HDR = API_TOKEN ? { "ngrok-skip-browser-warning": "1", "X-Token": API_TOKEN } : { "ngrok-skip-browser-warning": "1" };
+
 const Api = {
-  base: (location.hostname.endsWith("github.io")
-    || location.protocol === "file:")
-    ? "https://unexpired-pogo-splotchy.ngrok-free.dev" : "",
-  H: { "ngrok-skip-browser-warning": "1", "Content-Type": "application/json" },
+  base: QS.get("api") || "",
+  /* github.io: адрес API приходит в query (?api=) из кнопки Menu */
+  /* fallback: same-origin (локальный /menu на 127.0.0.1) */
+  H: Object.assign({ "Content-Type": "application/json" }, API_HDR), token: API_TOKEN, hdr(extra) { return Object.assign({}, API_HDR, extra || {}); },
   init: (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) || "",
   stateCache: null,
   _imgCache: {},
 
   async post(path, body) {
+    if (!this.base && (location.hostname.endsWith("github.io") || location.protocol === "file:")) { throw new Error("API не задан: откройте меню кнопкой Menu в боте"); }
     const r = await fetch(this.base + path, {
       method: "POST",
       headers: this.H,
@@ -24,7 +27,7 @@ const Api = {
 
   async get(path) {
     const r = await fetch(this.base + path, {
-      headers: { "ngrok-skip-browser-warning": "1" }, cache: "no-store" });
+      headers: this.hdr(), cache: "no-store" });
     if (!r.ok) throw new Error("HTTP " + r.status + " on " + path);
     return await r.json();
   },
@@ -47,9 +50,9 @@ const Api = {
     if (!url) return "";
     if (this._imgCache[url]) return this._imgCache[url];
     try {
-      const sep = url.includes("?") ? "&" : "?";
-      const r = await fetch(this.base + url + sep + "cb=" + Date.now(), {
-        headers: { "ngrok-skip-browser-warning": "1" }, cache: "no-store" });
+      const sep = url.includes("?") ? "&" : "?"; const aq = (!this.token && this.init) ? "&init_data=" + encodeURIComponent(this.init) : "";
+      const r = await fetch(this.base + url + sep + "cb=" + Date.now() + aq, {
+        headers: this.hdr(), cache: "no-store" });
       if (!r.ok) throw new Error("HTTP " + r.status);
       const u = URL.createObjectURL(await r.blob());
       this._imgCache[url] = u;

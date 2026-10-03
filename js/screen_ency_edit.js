@@ -119,7 +119,7 @@ Router.register("ency_edit", function (box, params) {
       const r = await fetch(Api.base +
         "/api/upload_entity_image?entity=" + et + "&id=" + params.id,
         { method: "POST",
-          headers: { "ngrok-skip-browser-warning": "1" }, body: fd });
+          headers: Api.hdr(), body: fd });
       const res = await r.json();
       if (res && res.ok) {
         refreshPreview(); await Api.loadState();

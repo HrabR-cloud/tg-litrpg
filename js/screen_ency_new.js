@@ -190,7 +190,7 @@ Router.register("ency_new", function (box, params) {
         "/api/upload_entity_image?entity=" +
         (isNpc ? "npc" : entity) + "&id=" + r.id,
         { method: "POST",
-          headers: { "ngrok-skip-browser-warning": "1" }, body: fd });
+          headers: Api.hdr(), body: fd });
       const res = await rr.json();
       if (res && res.ok) {
         Api.resetImgCache();

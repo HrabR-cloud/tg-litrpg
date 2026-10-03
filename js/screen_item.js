@@ -131,7 +131,7 @@ Router.register("item_edit", function (box, params) {
     const f = fi.files[0]; if (!f) return;
     const fd = new FormData(); fd.append("file", f);
     const r = await fetch(Api.base + "/api/upload_entity_image?entity=item&id=" + row.item_id,
-      { method: "POST", headers: { "ngrok-skip-browser-warning": "1" }, body: fd });
+      { method: "POST", headers: Api.hdr(), body: fd });
     const res = await r.json();
     if (res && res.ok) { refreshPreview(); Api.toast("✅ Загружено"); }
     else Api.toast("❌ Ошибка загрузки");

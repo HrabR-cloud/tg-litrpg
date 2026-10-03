@@ -270,7 +270,7 @@ Router.register("hero_edit", function (box) {
       try {
         const r = await fetch(
           Api.base + "/api/upload_entity_image?entity=hero&id=" + h.id, {
-            method: "POST", headers: { "ngrok-skip-browser-warning": "1" },
+            method: "POST", headers: Api.hdr(),
             body: fd });
         const res = await r.json();
         Api.toast(res && res.ok ? "✅ Загружено"

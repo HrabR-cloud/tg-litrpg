@@ -277,7 +277,7 @@ showUrl(URL.createObjectURL(f));
 const id=await ensureId();
 if(!id) return Api.toast("❌ Не удалось создать предмет");
 const fd=new FormData(); fd.append("file",f);
-const r=await fetch(Api.base+"/api/wardrobe/item_upload?id="+id,{method:"POST",headers:{"ngrok-skip-browser-warning":"1"},body:fd});
+const r=await fetch(Api.base+"/api/wardrobe/item_upload?id="+id,{method:"POST",headers:Api.hdr(),body:fd});
 const res=await r.json();
 if(!res||!res.ok) return Api.toast("❌ Ошибка загрузки");
 Api.toast("⏳ Модельер описывает изображение…");

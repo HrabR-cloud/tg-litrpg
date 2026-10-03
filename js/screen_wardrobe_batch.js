@@ -183,7 +183,7 @@ const fd = new FormData(); fd.append("file", f);
 Api.toast("⏳ Загрузка и анализ изображения…");
 fetch(Api.base+"/api/wardrobe/batch_upload?style="+style+
 "&category="+cat,
-{ method: "POST", headers: {"ngrok-skip-browser-warning":"1"},
+{ method: "POST", headers: Api.hdr(),
 body: fd })
 .then(function (r) { return r.json(); })
 .then(function (res) {
